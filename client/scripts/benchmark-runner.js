@@ -410,6 +410,15 @@ function calculateScoring(aggregates) {
     }
   };
 
+  // Track total errors per format across all sizes
+  const formatErrors = new Map();
+  for (const formats of Object.values(aggregates)) {
+    for (const [formatId, format] of Object.entries(formats)) {
+      const current = formatErrors.get(formatId) || 0;
+      formatErrors.set(formatId, current + (format.errors || 0));
+    }
+  }
+
   // Calculate scores per size
   for (const [size, formats] of Object.entries(aggregates)) {
     const formatsList = Object.values(formats);
@@ -423,7 +432,8 @@ function calculateScoring(aggregates) {
         formatId: format.formatId,
         label: FORMAT_LABELS[format.formatId] || format.formatId,
         categoryScores,
-        overallScore
+        overallScore,
+        errors: format.errors || 0
       };
     }
   }
@@ -439,6 +449,7 @@ function calculateScoring(aggregates) {
   for (const formatId of formatIds) {
     const sizeScores = [];
     const categoryTotals = { speed: [], efficiency: [], stability: [], resources: [] };
+    const totalErrors = formatErrors.get(formatId) || 0;
 
     for (const size of Object.keys(scoring.bySize)) {
       const sizeData = scoring.bySize[size][formatId];
@@ -467,16 +478,21 @@ function calculateScoring(aggregates) {
       formatId,
       label: FORMAT_LABELS[formatId] || formatId,
       overallScore: avgOverall,
-      categoryScores: avgCategories
+      categoryScores: avgCategories,
+      errors: totalErrors,
+      hasErrors: totalErrors > 0
     };
   }
 
-  // Determine category winners
+  // Determine category winners (EXCLUDE formats with errors)
   for (const category of Object.keys(CATEGORY_WEIGHTS)) {
     let bestFormat = null;
     let bestScore = -Infinity;
 
     for (const [formatId, data] of Object.entries(scoring.overall)) {
+      // Skip formats with any errors
+      if (data.hasErrors) continue;
+
       const score = data.categoryScores[category];
       if (score !== null && score > bestScore) {
         bestScore = score;
@@ -489,11 +505,14 @@ function calculateScoring(aggregates) {
       : null;
   }
 
-  // Determine overall winner
+  // Determine overall winner (EXCLUDE formats with errors)
   let overallBest = null;
   let overallBestScore = -Infinity;
 
   for (const [formatId, data] of Object.entries(scoring.overall)) {
+    // Skip formats with any errors
+    if (data.hasErrors) continue;
+
     if (data.overallScore !== null && data.overallScore > overallBestScore) {
       overallBestScore = data.overallScore;
       overallBest = formatId;
@@ -615,8 +634,29 @@ function detectAnomalies(aggregates, iterations) {
     }
   }
 
+  // Check for formats with errors (HIGH severity - these are excluded from rankings)
+  const formatErrorCounts = new Map();
+  for (const [size, rows] of Object.entries(aggregates)) {
+    for (const row of rows) {
+      if (row.errors > 0) {
+        const current = formatErrorCounts.get(row.formatId) || { label: row.label, count: 0, sizes: [] };
+        current.count += row.errors;
+        current.sizes.push(size);
+        formatErrorCounts.set(row.formatId, current);
+      }
+    }
+  }
+  for (const [formatId, info] of formatErrorCounts) {
+    anomalies.warnings.push({
+      type: "format_errors",
+      message: `${info.label} had ${info.count} error(s) across ${info.sizes.join(", ")} sizes. This format is EXCLUDED from winner rankings. Check server logs for 500 errors.`,
+      severity: "high",
+      recommendation: "Investigate server-side exceptions. Common causes: serialization bugs, missing dependencies, or out-of-memory errors."
+    });
+  }
+
   // Set overall data quality
-  if (anomalies.errors.length > 0) {
+  if (anomalies.errors.length > 0 || formatErrorCounts.size > 0) {
     anomalies.dataQuality = "poor";
   } else if (anomalies.warnings.length > 3) {
     anomalies.dataQuality = "fair";
@@ -1701,8 +1741,6 @@ async function main() {
     "compile",
     "exec:java",
     "-Dexec.mainClass=com.benchmark.server.EmbeddedTomcat",
-    "-Dexec.jvmArgs=--add-opens=java.base/java.nio=ALL-UNNAMED",
-    "-Dexec.fork=true",
     "-Dserver.webapp=server/src/main/webapp",
     "-Dserver.classes=server/target/classes",
     "-Dserver.port=8090"
@@ -1725,7 +1763,7 @@ async function main() {
     cwd: repoRoot,
     env: {
       ...process.env,
-      JAVA_TOOL_OPTIONS: "--add-opens=java.base/java.nio=ALL-UNNAMED"
+      MAVEN_OPTS: "--add-opens=java.base/java.nio=ALL-UNNAMED"
     }
   });
 

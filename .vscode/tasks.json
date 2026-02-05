@@ -42,6 +42,11 @@
 				"-Dserver.webapp=server/src/main/webapp",
 				"-Dserver.classes=server/target/classes"
 			],
+			"options": {
+				"env": {
+					"MAVEN_OPTS": "--add-opens=java.base/java.nio=ALL-UNNAMED"
+				}
+			},
 			"isBackground": true,
 			"problemMatcher": []
 		},
@@ -56,10 +61,14 @@
 				"compile",
 				"exec:java",
 				"-Dexec.mainClass=com.benchmark.server.EmbeddedTomcat",
-				"-Dexec.jvmArgs=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005",
 				"-Dserver.webapp=server/src/main/webapp",
 				"-Dserver.classes=server/target/classes"
 			],
+			"options": {
+				"env": {
+					"MAVEN_OPTS": "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 --add-opens=java.base/java.nio=ALL-UNNAMED"
+				}
+			},
 			"isBackground": true,
 			"problemMatcher": []
 		},
