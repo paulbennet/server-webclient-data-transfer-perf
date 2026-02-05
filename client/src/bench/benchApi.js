@@ -14,7 +14,7 @@ export async function runBenchmark(formatId, sizePreset) {
   const startTotal = performance.now();
   const response = await fetch(url);
   const payload = await response.arrayBuffer();
-  const endTotal = performance.now();
+  let endTotal = performance.now();
 
   if (!response.ok) {
     return {
@@ -37,8 +37,29 @@ export async function runBenchmark(formatId, sizePreset) {
     } else if (formatId === "cbor") {
       parsed = decodeCbor(new Uint8Array(payload));
     } else if (formatId === "flexbuffers") {
-      const ref = toReference(new Uint8Array(payload));
-      parsed = ref.toObject();
+      const originalGetBigUint64 = DataView.prototype.getBigUint64;
+      const originalGetBigInt64 = DataView.prototype.getBigInt64;
+      if (originalGetBigUint64) {
+        DataView.prototype.getBigUint64 = function (offset, littleEndian) {
+          return Number(originalGetBigUint64.call(this, offset, littleEndian));
+        };
+      }
+      if (originalGetBigInt64) {
+        DataView.prototype.getBigInt64 = function (offset, littleEndian) {
+          return Number(originalGetBigInt64.call(this, offset, littleEndian));
+        };
+      }
+      try {
+        const ref = toReference(payload);
+        parsed = ref.toObject();
+      } finally {
+        if (originalGetBigUint64) {
+          DataView.prototype.getBigUint64 = originalGetBigUint64;
+        }
+        if (originalGetBigInt64) {
+          DataView.prototype.getBigInt64 = originalGetBigInt64;
+        }
+      }
     } else if (formatId === "flatbuffers") {
       const bb = new flatbuffers.ByteBuffer(new Uint8Array(payload));
       const list = CalendarEventList.getRootAsCalendarEventList(bb);
@@ -66,8 +87,9 @@ export async function runBenchmark(formatId, sizePreset) {
     parseError = error instanceof Error ? error.message : String(error);
   }
   const parseEnd = performance.now();
+  endTotal = performance.now();
 
-  const parseMs = parsed ? parseEnd - parseStart : null;
+  const parseMs = parseEnd - parseStart;
 
   if (parseError) {
     return {
