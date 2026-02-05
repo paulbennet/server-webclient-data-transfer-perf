@@ -243,6 +243,25 @@ GET /api/health
 
 **Response:** `200 OK` with body `ok`
 
+### Garbage Collection
+
+```
+GET /api/gc
+```
+
+Triggers JVM garbage collection for benchmark isolation. Useful for consistent memory measurements between runs.
+
+**Response:**
+
+```json
+{
+  "status": "ok",
+  "heapBefore": 52428800,
+  "heapAfter": 31457280,
+  "freed": 20971520
+}
+```
+
 ### Benchmark Endpoint
 
 ```
@@ -258,12 +277,19 @@ GET /api/bench?format={format}&size={size}
 
 **Response Headers:**
 
-| Header              | Description                              | Example                 |
-| ------------------- | ---------------------------------------- | ----------------------- |
-| `X-Serialize-Nanos` | Server serialization time in nanoseconds | `12345678`              |
-| `X-Payload-Bytes`   | Response body size in bytes              | `524288`                |
-| `X-Format`          | Format used for serialization            | `messagepack`           |
-| `Content-Type`      | MIME type of response                    | `application/x-msgpack` |
+| Header               | Description                              | Example                 |
+| -------------------- | ---------------------------------------- | ----------------------- |
+| `X-Serialize-Nanos`  | Server serialization time in nanoseconds | `12345678`              |
+| `X-Payload-Bytes`    | Response body size in bytes              | `524288`                |
+| `X-Format`           | Format used for serialization            | `messagepack`           |
+| `X-Heap-Used-Before` | JVM heap usage before serialization      | `52428800`              |
+| `X-Heap-Used-After`  | JVM heap usage after serialization       | `53477376`              |
+| `X-Heap-Delta`       | Memory allocated during serialization    | `1048576`               |
+| `X-GC-Count`         | GC collections during serialization      | `0`                     |
+| `X-GC-Time-Ms`       | Total GC pause time (milliseconds)       | `0`                     |
+| `X-CPU-Time-Nanos`   | CPU time consumed (nanoseconds)          | `8765432`               |
+| `X-Event-Count`      | Number of events in response             | `1000`                  |
+| `Content-Type`       | MIME type of response                    | `application/x-msgpack` |
 
 **Response Body:** Serialized event data in the requested format.
 
@@ -369,6 +395,17 @@ This will:
 BENCH_ITERATIONS=5 BENCH_HEADLESS=true npm --prefix client run benchmark:run
 ```
 
+### Scoring System
+
+The benchmark uses a weighted scoring system defined in [client/scripts/benchmark-config.js](client/scripts/benchmark-config.js):
+
+| Category   | Weight | Description                           |
+| ---------- | ------ | ------------------------------------- |
+| Speed      | 35%    | End-to-end latency, TTFB, parse time  |
+| Efficiency | 25%    | Payload size, bytes per record        |
+| Stability  | 20%    | Variance, P99/mean ratio, consistency |
+| Resources  | 20%    | Memory usage, GC impact, CPU time     |
+
 ### Report Output
 
 The HTML report is generated at [client/reports/benchmark-report.html](client/reports/benchmark-report.html) and includes:
@@ -377,6 +414,7 @@ The HTML report is generated at [client/reports/benchmark-report.html](client/re
 - Overall average comparison
 - Latency breakdown charts (serialize, transfer, parse)
 - Payload size comparison charts
+- Memory and resource usage comparisons
 - Per-format aggregated metrics (mean, P95)
 - Expandable run details
 
@@ -556,7 +594,8 @@ BENCH_TIMEOUT_MS=1200000 npm --prefix client run benchmark:run
 │   │       ├── benchApi.js       # API client & parsers
 │   │       └── formats.js        # Format definitions
 │   ├── scripts/
-│   │   └── benchmark-runner.js   # Playwright automation
+│   │   ├── benchmark-runner.js   # Playwright automation
+│   │   └── benchmark-config.js   # Scoring weights & metrics
 │   └── reports/
 │       └── benchmark-report.html # Generated report
 └── server/                       # Java server application
@@ -567,11 +606,14 @@ BENCH_TIMEOUT_MS=1200000 npm --prefix client run benchmark:run
         │   │   ├── EmbeddedTomcat.java       # Server entry point
         │   │   ├── action/
         │   │   │   ├── BenchmarkAction.java  # Benchmark endpoint
+        │   │   │   ├── GcAction.java         # GC trigger endpoint
         │   │   │   └── HealthAction.java     # Health endpoint
         │   │   ├── filter/
         │   │   │   └── CorsFilter.java       # CORS handling
         │   │   ├── generator/
         │   │   │   └── EventDataGenerator.java
+        │   │   ├── metrics/
+        │   │   │   └── RequestMetrics.java   # JVM metrics capture
         │   │   ├── model/
         │   │   │   └── CalendarEvent.java    # Data model
         │   │   └── serialization/
