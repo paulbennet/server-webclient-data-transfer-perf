@@ -1059,7 +1059,7 @@ function createReportHtml(reportData) {
     }
     main {
       max-width: 1120px;
-      margin: -64px auto 72px;
+      margin: -32px auto 72px;
       padding: 0 24px 48px;
       display: grid;
       gap: 24px;
