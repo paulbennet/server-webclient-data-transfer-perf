@@ -15,7 +15,17 @@
             <result type="stream">
                 <param name="contentType">${contentType}</param>
                 <param name="inputName">inputStream</param>
-                <param name="contentLength">${contentLength}</param>
+                <param
+                    name="contentLength">${contentLength}</param>
+            </result>
+        </action>
+
+        <action name="gc" class="com.benchmark.server.action.GcAction">
+            <result type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">inputStream</param>
+                <param
+                    name="contentLength">${contentLength}</param>
             </result>
         </action>
     </package>

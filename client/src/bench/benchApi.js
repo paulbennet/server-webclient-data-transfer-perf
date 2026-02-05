@@ -87,6 +87,11 @@ export async function runBenchmark(formatId, sizePreset) {
   const base = import.meta.env.VITE_SERVER_BASE || DEFAULT_BASE;
   const url = `${base}/api/bench?format=${formatId}&size=${sizePreset}`;
 
+  // Clear resource timing buffer to ensure we get fresh timing data
+  if (typeof performance !== "undefined" && performance.clearResourceTimings) {
+    performance.clearResourceTimings();
+  }
+
   // Setup long task observer before fetch
   const longTaskObserver = createLongTaskObserver();
 

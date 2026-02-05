@@ -20,7 +20,8 @@ const repoRoot = path.resolve(__dirname, "..", "..");
 
 const SERVER_BASE = process.env.BENCH_SERVER_BASE || "http://localhost:8090";
 const CLIENT_BASE = process.env.BENCH_CLIENT_BASE || "http://localhost:5173";
-const ITERATIONS = Number.parseInt(process.env.BENCH_ITERATIONS || "3", 10);
+const ITERATIONS = Number.parseInt(process.env.BENCH_ITERATIONS || "5", 10);
+const WARMUP_ITERATIONS = Number.parseInt(process.env.BENCH_WARMUP || "2", 10);
 const TIMEOUT_MS = Number.parseInt(process.env.BENCH_TIMEOUT_MS || "600000", 10);
 const HEADLESS = process.env.BENCH_HEADLESS === "true";
 const REPORT_PATH = process.env.BENCH_REPORT_PATH || path.join(repoRoot, "client", "reports", "benchmark-report.html");
@@ -506,6 +507,126 @@ function calculateScoring(aggregates) {
   return scoring;
 }
 
+/**
+ * Detect anomalies in benchmark data
+ * @param {object} aggregates - Aggregated results by size
+ * @param {number} iterations - Number of iterations run
+ * @returns {object} Anomaly report
+ */
+function detectAnomalies(aggregates, iterations) {
+  const anomalies = {
+    warnings: [],
+    errors: [],
+    dataQuality: "good"
+  };
+
+  // Check for insufficient sample size
+  if (iterations < 3) {
+    anomalies.warnings.push({
+      type: "low_sample_size",
+      message: `Only ${iterations} iteration(s) run. Statistical measures like stddev and p95 may be unreliable. Recommend 5+ iterations.`,
+      severity: "warning"
+    });
+  }
+
+  // Check for zero standard deviation (indicates single run or identical values)
+  for (const [size, rows] of Object.entries(aggregates)) {
+    for (const row of rows) {
+      if (row.endToEnd.stddev === 0 && row.endToEnd.count > 1) {
+        anomalies.warnings.push({
+          type: "zero_variance",
+          message: `${row.label} in ${size} has zero variance despite ${row.endToEnd.count} runs - data may be cached or stale.`,
+          severity: "warning"
+        });
+      }
+    }
+  }
+
+  // Check for negative heap deltas (GC interference)
+  for (const [size, rows] of Object.entries(aggregates)) {
+    for (const row of rows) {
+      const serverHeapDelta = row.serverHeapDelta?.mean;
+      if (serverHeapDelta !== null && serverHeapDelta < -1000000) { // -1MB threshold
+        anomalies.warnings.push({
+          type: "gc_interference",
+          message: `${row.label} in ${size} shows significant negative heap delta (${formatBytes(serverHeapDelta)}) - GC likely ran during measurement.`,
+          severity: "info"
+        });
+      }
+    }
+  }
+
+  // Check for missing TTFB values
+  let missingTtfbCount = 0;
+  let totalTtfbChecks = 0;
+  for (const [size, rows] of Object.entries(aggregates)) {
+    for (const row of rows) {
+      totalTtfbChecks++;
+      if (row.ttfb?.mean === null || row.ttfb?.count === 0) {
+        missingTtfbCount++;
+      }
+    }
+  }
+  if (missingTtfbCount > 0 && missingTtfbCount === totalTtfbChecks) {
+    anomalies.warnings.push({
+      type: "missing_ttfb",
+      message: "All TTFB measurements are null. Resource Timing API may not be working. Check Timing-Allow-Origin header.",
+      severity: "warning"
+    });
+  }
+
+  // Check for inverted scaling (smaller datasets taking longer than larger ones)
+  const sizeOrder = ["small", "medium", "large"];
+  for (const row of aggregates[sizeOrder[0]] || []) {
+    const formatId = row.formatId;
+    const times = sizeOrder.map(size => {
+      const sizeData = aggregates[size]?.find(r => r.formatId === formatId);
+      return sizeData?.endToEnd?.mean;
+    }).filter(t => t !== null && t !== undefined);
+
+    if (times.length >= 2) {
+      for (let i = 0; i < times.length - 1; i++) {
+        if (times[i] > times[i + 1] * 1.5) { // Current is 50% slower than next larger size
+          anomalies.warnings.push({
+            type: "inverted_scaling",
+            message: `${row.label}: ${sizeOrder[i]} (${formatNumber(times[i])}ms) is slower than ${sizeOrder[i + 1]} (${formatNumber(times[i + 1])}ms) - possible cold start or caching issue.`,
+            severity: "warning"
+          });
+        }
+      }
+    }
+  }
+
+  // Check for extremely high coefficient of variation (>50%)
+  for (const [size, rows] of Object.entries(aggregates)) {
+    for (const row of rows) {
+      const mean = row.endToEnd?.mean;
+      const stddev = row.endToEnd?.stddev;
+      if (mean && stddev && mean > 0) {
+        const cv = (stddev / mean) * 100;
+        if (cv > 50) {
+          anomalies.warnings.push({
+            type: "high_variance",
+            message: `${row.label} in ${size} has ${cv.toFixed(1)}% coefficient of variation - results are highly inconsistent.`,
+            severity: "warning"
+          });
+        }
+      }
+    }
+  }
+
+  // Set overall data quality
+  if (anomalies.errors.length > 0) {
+    anomalies.dataQuality = "poor";
+  } else if (anomalies.warnings.length > 3) {
+    anomalies.dataQuality = "fair";
+  } else if (anomalies.warnings.length > 0) {
+    anomalies.dataQuality = "acceptable";
+  }
+
+  return anomalies;
+}
+
 function createReportHtml(reportData) {
   const timestamp = new Date(reportData.generatedAt).toISOString();
   const sizes = reportData.sizes;
@@ -751,6 +872,34 @@ function createReportHtml(reportData) {
       </div>
     </section>
   `;
+
+  // Build anomalies/warnings section
+  const anomalies = reportData.anomalies || [];
+  const anomaliesHtml = anomalies.length > 0 ? `
+    <section class="card anomalies-section">
+      <div class="section-title">
+        <h2>⚠️ Data Quality Warnings</h2>
+        <span class="note">${anomalies.length} issue${anomalies.length > 1 ? 's' : ''} detected that may affect benchmark validity</span>
+      </div>
+      <div class="anomalies-list">
+        ${anomalies.map(a => {
+          const severityClass = a.severity === 'high' ? 'anomaly-high' : a.severity === 'medium' ? 'anomaly-medium' : 'anomaly-low';
+          const severityIcon = a.severity === 'high' ? '🔴' : a.severity === 'medium' ? '🟠' : '🟡';
+          return `
+            <div class="anomaly-item ${severityClass}">
+              <div class="anomaly-header">
+                <span class="anomaly-icon">${severityIcon}</span>
+                <span class="anomaly-type">${a.type.replace(/_/g, ' ').toUpperCase()}</span>
+                <span class="anomaly-severity">${a.severity}</span>
+              </div>
+              <div class="anomaly-message">${a.message}</div>
+              ${a.recommendation ? `<div class="anomaly-recommendation">💡 ${a.recommendation}</div>` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </section>
+  ` : '';
 
   // Build scoring breakdown section
   const scoringHtml = scoring.overall ? `
@@ -1116,6 +1265,64 @@ function createReportHtml(reportData) {
       cursor: pointer;
       font-weight: 600;
     }
+    /* Anomalies/Warnings Section */
+    .anomalies-section {
+      border-left: 4px solid #f59e0b;
+    }
+    .anomalies-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .anomaly-item {
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .anomaly-high {
+      background: #fef2f2;
+      border-color: #fca5a5;
+    }
+    .anomaly-medium {
+      background: #fffbeb;
+      border-color: #fcd34d;
+    }
+    .anomaly-low {
+      background: #fefce8;
+      border-color: #fde047;
+    }
+    .anomaly-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .anomaly-icon {
+      font-size: 14px;
+    }
+    .anomaly-type {
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+    .anomaly-severity {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.06);
+      text-transform: uppercase;
+    }
+    .anomaly-message {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .anomaly-recommendation {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      font-style: italic;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -1136,6 +1343,7 @@ function createReportHtml(reportData) {
   </header>
   <main>
     ${insightsHtml}
+    ${anomaliesHtml}
     ${scoringHtml}
     ${rankingsHtml}
     <section class="card">
@@ -1541,10 +1749,45 @@ async function main() {
   const sizeSelect = page.getByLabel("Dataset size");
   await runButton.waitFor({ timeout: 120000 });
 
+  // Warmup runs to stabilize JIT and system caches
+  if (WARMUP_ITERATIONS > 0) {
+    console.log(`\nRunning ${WARMUP_ITERATIONS} warmup iteration(s)...`);
+    for (let warmup = 1; warmup <= WARMUP_ITERATIONS; warmup += 1) {
+      for (const size of SIZE_PRESETS) {
+        console.log(`  Warmup ${warmup}: ${size.id}...`);
+        await page.evaluate(() => {
+          window.__benchResults = null;
+        });
+        await sizeSelect.click();
+        await page.getByRole("option", { name: size.label }).click();
+        await runButton.click();
+        await page.waitForFunction(
+          (expectedSize) =>
+            window.__benchResults &&
+            window.__benchResults.status === "done" &&
+            window.__benchResults.sizePreset === expectedSize,
+          size.id,
+          { timeout: TIMEOUT_MS }
+        );
+        // Discard warmup results
+      }
+    }
+    console.log("Warmup complete.\n");
+  }
+
   const runs = [];
   for (const size of SIZE_PRESETS) {
     for (let iteration = 1; iteration <= ITERATIONS; iteration += 1) {
-      console.log(`Running ${size.id} iteration ${iteration}...`);
+      console.log(`Running ${size.id} iteration ${iteration}/${ITERATIONS}...`);
+
+      // Request GC on server before each measurement for more reliable memory metrics
+      try {
+        await fetch(`${SERVER_BASE}/api/gc`, { method: "POST" });
+        await new Promise(r => setTimeout(r, 100)); // Let GC settle
+      } catch (e) {
+        // GC endpoint may not exist, continue anyway
+      }
+
       await page.evaluate(() => {
         window.__benchResults = null;
       });
@@ -1680,9 +1923,13 @@ async function main() {
   // Calculate scoring based on all metrics
   const scoring = calculateScoring(aggregatesForScoring);
 
+  // Detect anomalies in the data
+  const anomalies = detectAnomalies(aggregateRows, ITERATIONS);
+
   const reportData = {
     generatedAt: Date.now(),
     iterations: ITERATIONS,
+    warmupIterations: WARMUP_ITERATIONS,
     sizes: SIZE_PRESETS.map((size) => size.id),
     serverBase: SERVER_BASE,
     clientBase: CLIENT_BASE,
@@ -1690,7 +1937,8 @@ async function main() {
     runs,
     aggregates: aggregateRows,
     details: detailsRows,
-    scoring
+    scoring,
+    anomalies
   };
 
   const reportHtml = createReportHtml(reportData);

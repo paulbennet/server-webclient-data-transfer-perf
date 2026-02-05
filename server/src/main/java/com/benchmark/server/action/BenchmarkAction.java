@@ -134,6 +134,8 @@ public class BenchmarkAction extends ActionSupport {
         response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         response.setHeader("Access-Control-Expose-Headers", EXPOSED_HEADERS);
+        // Enable Resource Timing API access for TTFB measurements
+        response.setHeader("Timing-Allow-Origin", "*");
     }
 
     public InputStream getInputStream() {
