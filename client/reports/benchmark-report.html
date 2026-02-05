@@ -5,103 +5,301 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Benchmark Report</title>
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500&display=swap");
     :root {
       color-scheme: light;
-      --bg: #f5f7fb;
+      --bg: #eef1f7;
       --card: #ffffff;
-      --text: #1f2a44;
-      --muted: #5b6b85;
-      --accent: #0a4d8c;
-      --accent-2: #f2a154;
-      --border: #e5e9f2;
+      --text: #111827;
+      --muted: #5b6478;
+      --accent: #0f3d7a;
+      --accent-2: #ff8c42;
+      --border: #e3e8f3;
+      --shadow: 0 18px 45px rgba(16, 24, 40, 0.12);
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
       margin: 0;
-      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #f9fbff 0%, #eef1f7 45%, #e6eaf5 100%);
       color: var(--text);
     }
-    header {
-      padding: 32px 24px 16px;
-      background: linear-gradient(120deg, #0a4d8c 0%, #5fa8d3 100%);
+    .hero {
+      background: linear-gradient(135deg, #0f3d7a 0%, #1a5aa0 55%, #5fa8d3 100%);
       color: #fff;
+      padding: 48px 24px 96px;
+      position: relative;
+      overflow: hidden;
     }
-    header h1 {
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.18), transparent 55%),
+        radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.12), transparent 50%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px 40px;
+      align-items: flex-end;
+      position: relative;
+      z-index: 1;
+    }
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-size: 12px;
+      opacity: 0.8;
       margin: 0 0 8px;
-      font-size: 28px;
     }
-    header p {
-      margin: 4px 0;
+    h1 {
+      margin: 0 0 8px;
+      font-family: "Newsreader", "Space Grotesk", serif;
+      font-size: clamp(32px, 3.2vw, 44px);
+    }
+    .subtitle {
+      margin: 0;
       opacity: 0.9;
     }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .pill-ok {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #0f3d1f;
+    }
+    .pill-warn {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #7f1d1d;
+    }
     main {
-      padding: 24px;
+      max-width: 1120px;
+      margin: -64px auto 72px;
+      padding: 0 24px 48px;
       display: grid;
       gap: 24px;
     }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: var(--shadow);
     }
     .section-title {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     .section-title h2 {
       margin: 0;
       font-size: 20px;
     }
-    .meta-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-    .meta-item {
-      background: #f7f9fc;
-      border-radius: 12px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-    }
-    .meta-item span {
-      display: block;
+    .note {
+      font-size: 13px;
       color: var(--muted);
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .summary-card {
+      background: #f7f8fd;
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #edf0f9;
+    }
+    .summary-label {
       font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 4px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
     }
-    .meta-item ol {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--text);
+    .summary-value {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 6px 0 4px;
+    }
+    .summary-detail {
       font-size: 13px;
+      color: var(--muted);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .summary-empty {
+      color: var(--muted);
       font-size: 14px;
     }
-    th, td {
-      padding: 10px;
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .info-card {
+      background: #f6f8fc;
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+    .info-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .info-value {
+      font-size: 14px;
+      word-break: break-word;
+    }
+    .rank-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .rank-card {
+      background: #f9fafc;
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+    .rank-title {
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .rank-card ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+    .rank-card li {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .medal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 24px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #e7edf9;
+      color: #1e3a8a;
+    }
+    .medal.gold { background: #ffedd5; color: #9a3412; }
+    .medal.silver { background: #e5e7eb; color: #334155; }
+    .medal.bronze { background: #fee2e2; color: #7f1d1d; }
+    .rank-metric {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .table-wrap {
+      margin-top: 18px;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 14px;
+    }
+    .data-table th,
+    .data-table td {
+      padding: 12px 10px;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
-    th {
+    .data-table th {
       background: #f2f5fb;
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--muted);
+    }
+    .data-table tbody tr:nth-child(odd) {
+      background: #f9fbff;
+    }
+    .data-table .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .row-top {
+      background: #e8f0ff;
+    }
+    .row-high {
+      background: #f1f5ff;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-ok {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .badge-error {
+      background: #fee2e2;
+      color: #b91c1c;
     }
     .chart-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 16px;
+      margin-bottom: 12px;
+    }
+    .chart-card {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 12px 12px 4px;
+      border: 1px solid var(--border);
+    }
+    .chart-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .size-topline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
     }
     details {
       border-top: 1px solid var(--border);
@@ -112,243 +310,294 @@
       cursor: pointer;
       font-weight: 600;
     }
-    .note {
-      font-size: 13px;
-      color: var(--muted);
-    }
-    ul {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--text);
-      line-height: 1.6;
-    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Binary Transfer Benchmark Report</h1>
-    <p>Generated at 2026-02-05T12:24:49.325Z</p>
-    <p>Iterations: 3 | Sizes: small, medium, large</p>
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <p class="eyebrow">Benchmark Report</p>
+        <h1>Binary Transfer Benchmarks</h1>
+        <p class="subtitle">Generated at 2026-02-05T12:35:42.579Z</p>
+      </div>
+      <div class="hero-meta">
+        <span class="pill">Iterations: 3</span>
+        <span class="pill">Sizes: small, medium, large</span>
+        <span class="pill">Runs: 9</span>
+      </div>
+    </div>
   </header>
   <main>
-    <section class="card">
-      <div class="section-title"><h2>Environment</h2></div>
-      <div class="meta-grid">
-        <div class="meta-item"><span>Server Base</span>http://localhost:8090</div>
-        <div class="meta-item"><span>Client Base</span>http://localhost:5173</div>
-        <div class="meta-item"><span>User Agent</span>Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36</div>
-        <div class="meta-item"><span>Total Runs</span>9</div>
-      </div>
-    </section>
     
     <section class="card">
-      <div class="section-title"><h2>Rankings</h2></div>
-      <div class="meta-grid">
+      <div class="section-title">
+        <h2>At a Glance</h2>
+        <span class="note">Key takeaways</span>
+      </div>
+      <div class="summary-grid">
         
-              <div class="meta-item">
-                <span>SMALL Rankings</span>
-                <ol>
-                  <li>FlatBuffers (11.83 ms)</li><li>CBOR (15.10 ms)</li><li>MessagePack (17.67 ms)</li>
-                </ol>
+              <div class="summary-card">
+                <div class="summary-label">Fastest Avg</div>
+                <div class="summary-value">MessagePack</div>
+                <div class="summary-detail">39.44 ms avg end-to-end</div>
               </div>
             
-              <div class="meta-item">
-                <span>MEDIUM Rankings</span>
-                <ol>
-                  <li>CBOR (28.53 ms)</li><li>Jackson Streaming (33.10 ms)</li><li>FlatBuffers (34.20 ms)</li>
-                </ol>
+              <div class="summary-card">
+                <div class="summary-label">Smallest Payload</div>
+                <div class="summary-value">Apache Arrow</div>
+                <div class="summary-detail">3.82 MB avg payload</div>
               </div>
             
-              <div class="meta-item">
-                <span>LARGE Rankings</span>
-                <ol>
-                  <li>Apache Arrow (79.57 ms)</li><li>FlatBuffers (84.43 ms)</li><li>CBOR (91.27 ms)</li>
-                </ol>
+              <div class="summary-card">
+                <div class="summary-label">Most Wins</div>
+                <div class="summary-value">MessagePack</div>
+                <div class="summary-detail">1 of 3 sizes</div>
               </div>
             
       </div>
-      <h3>Overall Average (End-to-End Mean)</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Format</th>
-            <th>Avg End-to-End (ms)</th>
-            <th>Avg Payload (bytes)</th>
-            <th>Errors</th>
-          </tr>
-        </thead>
-        <tbody>
-          
-              <tr>
-                <td>1</td>
-                <td>FlatBuffers</td>
-                <td>43.49</td>
-                <td>5491077</td>
-                <td>0</td>
-              </tr>
-            
-              <tr>
-                <td>2</td>
-                <td>CBOR</td>
-                <td>44.97</td>
-                <td>5800574</td>
-                <td>0</td>
-              </tr>
-            
-              <tr>
-                <td>3</td>
-                <td>MessagePack</td>
-                <td>50.21</td>
-                <td>5778523</td>
-                <td>0</td>
-              </tr>
-            
-              <tr>
-                <td>4</td>
-                <td>Jackson Streaming</td>
-                <td>54.29</td>
-                <td>7429655</td>
-                <td>0</td>
-              </tr>
-            
-              <tr>
-                <td>5</td>
-                <td>Apache Arrow</td>
-                <td>58.89</td>
-                <td>4001901</td>
-                <td>0</td>
-              </tr>
-            
-              <tr>
-                <td>6</td>
-                <td>org.json</td>
-                <td>171.04</td>
-                <td>7429655</td>
-                <td>0</td>
-              </tr>
-            
-        </tbody>
-      </table>
     </section>
   
     
     <section class="card">
-      <div class="section-title"><h2>Suggestions</h2></div>
-      <ul>
-        <li>Overall fastest average end-to-end: <strong>FlatBuffers</strong> (43.49 ms).</li><li>Most size wins: <strong>FlatBuffers</strong> (1 of 3 sizes).</li><li>Smallest payload on average: <strong>Apache Arrow</strong> (4001901 bytes).</li>
-      </ul>
+      <div class="section-title">
+        <h2>Rankings by Size</h2>
+        <span class="note">Top 3 by end-to-end mean</span>
+      </div>
+      <div class="rank-grid">
+        
+              <div class="rank-card">
+                <div class="rank-title">SMALL</div>
+                <ol>
+                  <li><span class="medal gold">#1</span>MessagePack<span class="rank-metric">11.10 ms</span></li><li><span class="medal silver">#2</span>CBOR<span class="rank-metric">16.03 ms</span></li><li><span class="medal bronze">#3</span>FlatBuffers<span class="rank-metric">17.43 ms</span></li>
+                </ol>
+              </div>
+            
+              <div class="rank-card">
+                <div class="rank-title">MEDIUM</div>
+                <ol>
+                  <li><span class="medal gold">#1</span>CBOR<span class="rank-metric">29.20 ms</span></li><li><span class="medal silver">#2</span>Jackson Streaming<span class="rank-metric">29.53 ms</span></li><li><span class="medal bronze">#3</span>MessagePack<span class="rank-metric">30.63 ms</span></li>
+                </ol>
+              </div>
+            
+              <div class="rank-card">
+                <div class="rank-title">LARGE</div>
+                <ol>
+                  <li><span class="medal gold">#1</span>Apache Arrow<span class="rank-metric">75.93 ms</span></li><li><span class="medal silver">#2</span>MessagePack<span class="rank-metric">76.60 ms</span></li><li><span class="medal bronze">#3</span>CBOR<span class="rank-metric">79.27 ms</span></li>
+                </ol>
+              </div>
+            
+      </div>
+      <div class="table-wrap">
+        <h3>Overall Average (End-to-End Mean)</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Format</th>
+              <th class="num">Avg End-to-End</th>
+              <th class="num">Avg Payload</th>
+              <th>Errors</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+                  <tr class="row-top">
+                    <td>1</td>
+                    <td>MessagePack</td>
+                    <td class="num">39.44 ms</td>
+                    <td class="num">5.51 MB</td>
+                    <td><span class="badge badge-ok">0</span></td>
+                  </tr>
+                
+                  <tr class="row-high">
+                    <td>2</td>
+                    <td>CBOR</td>
+                    <td class="num">41.50 ms</td>
+                    <td class="num">5.53 MB</td>
+                    <td><span class="badge badge-ok">0</span></td>
+                  </tr>
+                
+                  <tr class="row-high">
+                    <td>3</td>
+                    <td>FlatBuffers</td>
+                    <td class="num">43.96 ms</td>
+                    <td class="num">5.24 MB</td>
+                    <td><span class="badge badge-ok">0</span></td>
+                  </tr>
+                
+                  <tr class="">
+                    <td>4</td>
+                    <td>Jackson Streaming</td>
+                    <td class="num">51.79 ms</td>
+                    <td class="num">7.09 MB</td>
+                    <td><span class="badge badge-ok">0</span></td>
+                  </tr>
+                
+                  <tr class="">
+                    <td>5</td>
+                    <td>Apache Arrow</td>
+                    <td class="num">55.40 ms</td>
+                    <td class="num">3.82 MB</td>
+                    <td><span class="badge badge-ok">0</span></td>
+                  </tr>
+                
+                  <tr class="">
+                    <td>6</td>
+                    <td>org.json</td>
+                    <td class="num">176.92 ms</td>
+                    <td class="num">7.09 MB</td>
+                    <td><span class="badge badge-ok">0</span></td>
+                  </tr>
+                
+          </tbody>
+        </table>
+      </div>
     </section>
   
+    <section class="card">
+      <div class="section-title">
+        <h2>Environment</h2>
+        <span class="note">Runtime details</span>
+      </div>
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-label">Server Base</div>
+          <div class="info-value">http://localhost:8090</div>
+        </div>
+        <div class="info-card">
+          <div class="info-label">Client Base</div>
+          <div class="info-value">http://localhost:5173</div>
+        </div>
+        <div class="info-card">
+          <div class="info-label">User Agent</div>
+          <div class="info-value">Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36</div>
+        </div>
+        <div class="info-card">
+          <div class="info-label">Total Runs</div>
+          <div class="info-value">9</div>
+        </div>
+      </div>
+    </section>
     
         <section class="card" id="section-small">
           <div class="section-title">
             <h2>SMALL Dataset</h2>
             <span class="note">3 runs</span>
           </div>
+          <div class="size-topline">
+            <span class="pill">Fastest: MessagePack (11.10 ms)</span>
+            <span class="pill">Smallest payload: Apache Arrow (191.1 KB)</span>
+            <span class="pill pill-warn">Errors: 3 errors</span>
+          </div>
           <div class="chart-grid">
-            <canvas id="chart-times-small" height="220"></canvas>
-            <canvas id="chart-bytes-small" height="220"></canvas>
+            <div class="chart-card">
+              <div class="chart-title">Latency breakdown (ms)</div>
+              <canvas id="chart-times-small" height="220"></canvas>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Payload size (bytes)</div>
+              <canvas id="chart-bytes-small" height="220"></canvas>
+            </div>
           </div>
           <h3>Aggregated Metrics</h3>
-          <table>
+          <table class="data-table">
             <thead>
               <tr>
                 <th>Format</th>
-                <th>End-to-End Mean (ms)</th>
-                <th>End-to-End P95 (ms)</th>
-                <th>Parse Mean (ms)</th>
-                <th>Serialize Mean (ms)</th>
-                <th>Payload Mean (bytes)</th>
+                <th class="num">End-to-End Mean</th>
+                <th class="num">End-to-End P95</th>
+                <th class="num">Parse Mean</th>
+                <th class="num">Serialize Mean</th>
+                <th class="num">Payload Mean</th>
                 <th>Errors</th>
               </tr>
             </thead>
             <tbody>
               
-                    <tr>
+                    <tr class="">
                       <td>org.json</td>
-                      <td>41.73</td>
-                      <td>30.70</td>
-                      <td>0.77</td>
-                      <td>9.66</td>
-                      <td>360438</td>
-                      <td>0</td>
+                      <td class="num">58.60 ms</td>
+                      <td class="num">56.60 ms</td>
+                      <td class="num">0.77 ms</td>
+                      <td class="num">13.12 ms</td>
+                      <td class="num">352.0 KB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>Jackson Streaming</td>
-                      <td>19.47</td>
-                      <td>19.90</td>
-                      <td>0.77</td>
-                      <td>6.00</td>
-                      <td>360438</td>
-                      <td>0</td>
+                      <td class="num">17.73 ms</td>
+                      <td class="num">20.00 ms</td>
+                      <td class="num">0.80 ms</td>
+                      <td class="num">9.83 ms</td>
+                      <td class="num">352.0 KB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="row-high">
                       <td>FlexBuffers</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>3</td>
+                      <td class="num">- ms</td>
+                      <td class="num">- ms</td>
+                      <td class="num">- ms</td>
+                      <td class="num">- ms</td>
+                      <td class="num">-</td>
+                      <td><span class="badge badge-error">3</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>FlatBuffers</td>
-                      <td>11.83</td>
-                      <td>11.00</td>
-                      <td>1.03</td>
-                      <td>5.51</td>
-                      <td>268296</td>
-                      <td>0</td>
+                      <td class="num">17.43 ms</td>
+                      <td class="num">17.00 ms</td>
+                      <td class="num">0.97 ms</td>
+                      <td class="num">5.84 ms</td>
+                      <td class="num">262.0 KB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>MessagePack</td>
-                      <td>17.67</td>
-                      <td>20.60</td>
-                      <td>4.37</td>
-                      <td>6.54</td>
-                      <td>280603</td>
-                      <td>0</td>
+                      <td class="num">11.10 ms</td>
+                      <td class="num">10.10 ms</td>
+                      <td class="num">4.50 ms</td>
+                      <td class="num">5.61 ms</td>
+                      <td class="num">274.0 KB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>CBOR</td>
-                      <td>15.10</td>
-                      <td>6.20</td>
-                      <td>2.53</td>
-                      <td>10.08</td>
-                      <td>281782</td>
-                      <td>0</td>
+                      <td class="num">16.03 ms</td>
+                      <td class="num">10.90 ms</td>
+                      <td class="num">2.47 ms</td>
+                      <td class="num">8.75 ms</td>
+                      <td class="num">275.2 KB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>Apache Arrow</td>
-                      <td>60.33</td>
-                      <td>12.30</td>
-                      <td>1.33</td>
-                      <td>54.71</td>
-                      <td>195736</td>
-                      <td>0</td>
+                      <td class="num">51.73 ms</td>
+                      <td class="num">17.40 ms</td>
+                      <td class="num">1.10 ms</td>
+                      <td class="num">44.22 ms</td>
+                      <td class="num">191.1 KB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
             </tbody>
           </table>
           <details>
             <summary>Run Details</summary>
-            <table>
+            <table class="data-table">
               <thead>
                 <tr>
                   <th>Iteration</th>
                   <th>Format</th>
-                  <th>End-to-End (ms)</th>
-                  <th>Parse (ms)</th>
-                  <th>Serialize (ms)</th>
-                  <th>Payload (bytes)</th>
+                  <th class="num">End-to-End</th>
+                  <th class="num">Parse</th>
+                  <th class="num">Serialize</th>
+                  <th class="num">Payload</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -357,211 +606,211 @@
                       <tr>
                         <td>1</td>
                         <td>org.json</td>
-                        <td>82.60</td>
-                        <td>0.70</td>
-                        <td>16.82</td>
-                        <td>360438</td>
-                        <td>ok</td>
+                        <td class="num">89.40 ms</td>
+                        <td class="num">0.80 ms</td>
+                        <td class="num">19.68 ms</td>
+                        <td class="num">352.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>Jackson Streaming</td>
-                        <td>28.70</td>
-                        <td>0.80</td>
-                        <td>10.97</td>
-                        <td>360438</td>
-                        <td>ok</td>
+                        <td class="num">26.40 ms</td>
+                        <td class="num">0.80 ms</td>
+                        <td class="num">16.48 ms</td>
+                        <td class="num">352.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>FlexBuffers</td>
-                        <td>25.50</td>
-                        <td>-</td>
-                        <td>17.44</td>
-                        <td>357400</td>
-                        <td>error</td>
+                        <td class="num">21.60 ms</td>
+                        <td class="num">- ms</td>
+                        <td class="num">14.35 ms</td>
+                        <td class="num">349.0 KB</td>
+                        <td><span class="badge badge-error">error</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>FlatBuffers</td>
-                        <td>17.40</td>
-                        <td>1.70</td>
-                        <td>12.47</td>
-                        <td>268296</td>
-                        <td>ok</td>
+                        <td class="num">17.00 ms</td>
+                        <td class="num">1.30 ms</td>
+                        <td class="num">12.30 ms</td>
+                        <td class="num">262.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>MessagePack</td>
-                        <td>20.60</td>
-                        <td>7.20</td>
-                        <td>15.14</td>
-                        <td>280603</td>
-                        <td>ok</td>
+                        <td class="num">16.60 ms</td>
+                        <td class="num">7.10 ms</td>
+                        <td class="num">11.65 ms</td>
+                        <td class="num">274.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>CBOR</td>
-                        <td>32.90</td>
-                        <td>3.60</td>
-                        <td>27.84</td>
-                        <td>281782</td>
-                        <td>ok</td>
+                        <td class="num">28.90 ms</td>
+                        <td class="num">3.40 ms</td>
+                        <td class="num">23.77 ms</td>
+                        <td class="num">275.2 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>Apache Arrow</td>
-                        <td>159.70</td>
-                        <td>2.70</td>
-                        <td>154.43</td>
-                        <td>195736</td>
-                        <td>ok</td>
+                        <td class="num">129.50 ms</td>
+                        <td class="num">2.50 ms</td>
+                        <td class="num">124.47 ms</td>
+                        <td class="num">191.1 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>org.json</td>
-                        <td>11.90</td>
-                        <td>0.80</td>
-                        <td>5.79</td>
-                        <td>360438</td>
-                        <td>ok</td>
+                        <td class="num">56.60 ms</td>
+                        <td class="num">0.80 ms</td>
+                        <td class="num">14.13 ms</td>
+                        <td class="num">352.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>Jackson Streaming</td>
-                        <td>19.90</td>
-                        <td>0.70</td>
-                        <td>6.06</td>
-                        <td>360438</td>
-                        <td>ok</td>
+                        <td class="num">6.80 ms</td>
+                        <td class="num">0.80 ms</td>
+                        <td class="num">2.41 ms</td>
+                        <td class="num">352.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>FlexBuffers</td>
-                        <td>9.10</td>
-                        <td>-</td>
-                        <td>3.72</td>
-                        <td>357400</td>
-                        <td>error</td>
+                        <td class="num">13.80 ms</td>
+                        <td class="num">- ms</td>
+                        <td class="num">3.62 ms</td>
+                        <td class="num">349.0 KB</td>
+                        <td><span class="badge badge-error">error</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>FlatBuffers</td>
-                        <td>7.10</td>
-                        <td>0.80</td>
-                        <td>2.47</td>
-                        <td>268296</td>
-                        <td>ok</td>
+                        <td class="num">10.50 ms</td>
+                        <td class="num">1.00 ms</td>
+                        <td class="num">3.15 ms</td>
+                        <td class="num">262.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>MessagePack</td>
-                        <td>22.80</td>
-                        <td>3.80</td>
-                        <td>2.01</td>
-                        <td>280603</td>
-                        <td>ok</td>
+                        <td class="num">6.60 ms</td>
+                        <td class="num">4.20 ms</td>
+                        <td class="num">2.08 ms</td>
+                        <td class="num">274.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>CBOR</td>
-                        <td>6.20</td>
-                        <td>2.10</td>
-                        <td>1.38</td>
-                        <td>281782</td>
-                        <td>ok</td>
+                        <td class="num">10.90 ms</td>
+                        <td class="num">2.10 ms</td>
+                        <td class="num">1.52 ms</td>
+                        <td class="num">275.2 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>Apache Arrow</td>
-                        <td>9.00</td>
-                        <td>0.60</td>
-                        <td>4.20</td>
-                        <td>195736</td>
-                        <td>ok</td>
+                        <td class="num">17.40 ms</td>
+                        <td class="num">0.30 ms</td>
+                        <td class="num">4.42 ms</td>
+                        <td class="num">191.1 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>org.json</td>
-                        <td>30.70</td>
-                        <td>0.80</td>
-                        <td>6.36</td>
-                        <td>360438</td>
-                        <td>ok</td>
+                        <td class="num">29.80 ms</td>
+                        <td class="num">0.70 ms</td>
+                        <td class="num">5.55 ms</td>
+                        <td class="num">352.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>Jackson Streaming</td>
-                        <td>9.80</td>
-                        <td>0.80</td>
-                        <td>0.97</td>
-                        <td>360438</td>
-                        <td>ok</td>
+                        <td class="num">20.00 ms</td>
+                        <td class="num">0.80 ms</td>
+                        <td class="num">10.59 ms</td>
+                        <td class="num">352.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>FlexBuffers</td>
-                        <td>15.90</td>
-                        <td>-</td>
-                        <td>4.92</td>
-                        <td>357400</td>
-                        <td>error</td>
+                        <td class="num">11.80 ms</td>
+                        <td class="num">- ms</td>
+                        <td class="num">4.75 ms</td>
+                        <td class="num">349.0 KB</td>
+                        <td><span class="badge badge-error">error</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>FlatBuffers</td>
-                        <td>11.00</td>
-                        <td>0.60</td>
-                        <td>1.60</td>
-                        <td>268296</td>
-                        <td>ok</td>
+                        <td class="num">24.80 ms</td>
+                        <td class="num">0.60 ms</td>
+                        <td class="num">2.07 ms</td>
+                        <td class="num">262.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>MessagePack</td>
-                        <td>9.60</td>
-                        <td>2.10</td>
-                        <td>2.48</td>
-                        <td>280603</td>
-                        <td>ok</td>
+                        <td class="num">10.10 ms</td>
+                        <td class="num">2.20 ms</td>
+                        <td class="num">3.11 ms</td>
+                        <td class="num">274.0 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>CBOR</td>
-                        <td>6.20</td>
-                        <td>1.90</td>
-                        <td>1.01</td>
-                        <td>281782</td>
-                        <td>ok</td>
+                        <td class="num">8.30 ms</td>
+                        <td class="num">1.90 ms</td>
+                        <td class="num">0.97 ms</td>
+                        <td class="num">275.2 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>Apache Arrow</td>
-                        <td>12.30</td>
-                        <td>0.70</td>
-                        <td>5.51</td>
-                        <td>195736</td>
-                        <td>ok</td>
+                        <td class="num">8.30 ms</td>
+                        <td class="num">0.50 ms</td>
+                        <td class="num">3.77 ms</td>
+                        <td class="num">191.1 KB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
               </tbody>
@@ -574,108 +823,119 @@
             <h2>MEDIUM Dataset</h2>
             <span class="note">3 runs</span>
           </div>
+          <div class="size-topline">
+            <span class="pill">Fastest: CBOR (29.20 ms)</span>
+            <span class="pill">Smallest payload: Apache Arrow (1.87 MB)</span>
+            <span class="pill pill-warn">Errors: 3 errors</span>
+          </div>
           <div class="chart-grid">
-            <canvas id="chart-times-medium" height="220"></canvas>
-            <canvas id="chart-bytes-medium" height="220"></canvas>
+            <div class="chart-card">
+              <div class="chart-title">Latency breakdown (ms)</div>
+              <canvas id="chart-times-medium" height="220"></canvas>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Payload size (bytes)</div>
+              <canvas id="chart-bytes-medium" height="220"></canvas>
+            </div>
           </div>
           <h3>Aggregated Metrics</h3>
-          <table>
+          <table class="data-table">
             <thead>
               <tr>
                 <th>Format</th>
-                <th>End-to-End Mean (ms)</th>
-                <th>End-to-End P95 (ms)</th>
-                <th>Parse Mean (ms)</th>
-                <th>Serialize Mean (ms)</th>
-                <th>Payload Mean (bytes)</th>
+                <th class="num">End-to-End Mean</th>
+                <th class="num">End-to-End P95</th>
+                <th class="num">Parse Mean</th>
+                <th class="num">Serialize Mean</th>
+                <th class="num">Payload Mean</th>
                 <th>Errors</th>
               </tr>
             </thead>
             <tbody>
               
-                    <tr>
+                    <tr class="">
                       <td>org.json</td>
-                      <td>93.27</td>
-                      <td>90.90</td>
-                      <td>7.80</td>
-                      <td>73.55</td>
-                      <td>3633416</td>
-                      <td>0</td>
+                      <td class="num">103.47 ms</td>
+                      <td class="num">102.50 ms</td>
+                      <td class="num">7.63 ms</td>
+                      <td class="num">82.99 ms</td>
+                      <td class="num">3.47 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>Jackson Streaming</td>
-                      <td>33.10</td>
-                      <td>29.30</td>
-                      <td>7.33</td>
-                      <td>14.22</td>
-                      <td>3633416</td>
-                      <td>0</td>
+                      <td class="num">29.53 ms</td>
+                      <td class="num">31.90 ms</td>
+                      <td class="num">7.30 ms</td>
+                      <td class="num">10.11 ms</td>
+                      <td class="num">3.47 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="row-high">
                       <td>FlexBuffers</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>3</td>
+                      <td class="num">- ms</td>
+                      <td class="num">- ms</td>
+                      <td class="num">- ms</td>
+                      <td class="num">- ms</td>
+                      <td class="num">-</td>
+                      <td><span class="badge badge-error">3</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>FlatBuffers</td>
-                      <td>34.20</td>
-                      <td>29.10</td>
-                      <td>5.97</td>
-                      <td>17.32</td>
-                      <td>2700384</td>
-                      <td>0</td>
+                      <td class="num">33.03 ms</td>
+                      <td class="num">34.10 ms</td>
+                      <td class="num">5.77 ms</td>
+                      <td class="num">13.36 ms</td>
+                      <td class="num">2.58 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>MessagePack</td>
-                      <td>36.23</td>
-                      <td>28.20</td>
-                      <td>26.07</td>
-                      <td>12.50</td>
-                      <td>2828314</td>
-                      <td>0</td>
+                      <td class="num">30.63 ms</td>
+                      <td class="num">29.30 ms</td>
+                      <td class="num">25.80 ms</td>
+                      <td class="num">10.36 ms</td>
+                      <td class="num">2.70 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>CBOR</td>
-                      <td>28.53</td>
-                      <td>31.20</td>
-                      <td>20.17</td>
-                      <td>9.91</td>
-                      <td>2839189</td>
-                      <td>0</td>
+                      <td class="num">29.20 ms</td>
+                      <td class="num">29.80 ms</td>
+                      <td class="num">20.27 ms</td>
+                      <td class="num">10.52 ms</td>
+                      <td class="num">2.71 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>Apache Arrow</td>
-                      <td>36.77</td>
-                      <td>37.80</td>
-                      <td>0.47</td>
-                      <td>20.05</td>
-                      <td>1955984</td>
-                      <td>0</td>
+                      <td class="num">38.53 ms</td>
+                      <td class="num">42.40 ms</td>
+                      <td class="num">0.40 ms</td>
+                      <td class="num">22.29 ms</td>
+                      <td class="num">1.87 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
             </tbody>
           </table>
           <details>
             <summary>Run Details</summary>
-            <table>
+            <table class="data-table">
               <thead>
                 <tr>
                   <th>Iteration</th>
                   <th>Format</th>
-                  <th>End-to-End (ms)</th>
-                  <th>Parse (ms)</th>
-                  <th>Serialize (ms)</th>
-                  <th>Payload (bytes)</th>
+                  <th class="num">End-to-End</th>
+                  <th class="num">Parse</th>
+                  <th class="num">Serialize</th>
+                  <th class="num">Payload</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -684,211 +944,211 @@
                       <tr>
                         <td>1</td>
                         <td>org.json</td>
-                        <td>116.00</td>
-                        <td>8.30</td>
-                        <td>84.76</td>
-                        <td>3633416</td>
-                        <td>ok</td>
+                        <td class="num">102.50 ms</td>
+                        <td class="num">7.50 ms</td>
+                        <td class="num">68.28 ms</td>
+                        <td class="num">3.47 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>Jackson Streaming</td>
-                        <td>45.50</td>
-                        <td>7.40</td>
-                        <td>29.41</td>
-                        <td>3633416</td>
-                        <td>ok</td>
+                        <td class="num">34.20 ms</td>
+                        <td class="num">7.20 ms</td>
+                        <td class="num">11.40 ms</td>
+                        <td class="num">3.47 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>FlexBuffers</td>
-                        <td>54.40</td>
-                        <td>-</td>
-                        <td>35.27</td>
-                        <td>3664960</td>
-                        <td>error</td>
+                        <td class="num">78.50 ms</td>
+                        <td class="num">- ms</td>
+                        <td class="num">42.50 ms</td>
+                        <td class="num">3.50 MB</td>
+                        <td><span class="badge badge-error">error</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>FlatBuffers</td>
-                        <td>45.30</td>
-                        <td>6.40</td>
-                        <td>21.74</td>
-                        <td>2700384</td>
-                        <td>ok</td>
+                        <td class="num">35.80 ms</td>
+                        <td class="num">6.10 ms</td>
+                        <td class="num">15.15 ms</td>
+                        <td class="num">2.58 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>MessagePack</td>
-                        <td>55.70</td>
-                        <td>28.40</td>
-                        <td>25.49</td>
-                        <td>2828314</td>
-                        <td>ok</td>
+                        <td class="num">36.00 ms</td>
+                        <td class="num">27.50 ms</td>
+                        <td class="num">16.41 ms</td>
+                        <td class="num">2.70 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>CBOR</td>
-                        <td>33.90</td>
-                        <td>20.30</td>
-                        <td>16.78</td>
-                        <td>2839189</td>
-                        <td>ok</td>
+                        <td class="num">36.70 ms</td>
+                        <td class="num">21.20 ms</td>
+                        <td class="num">14.66 ms</td>
+                        <td class="num">2.71 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>Apache Arrow</td>
-                        <td>44.60</td>
-                        <td>0.40</td>
-                        <td>24.39</td>
-                        <td>1955984</td>
-                        <td>ok</td>
+                        <td class="num">42.80 ms</td>
+                        <td class="num">0.40 ms</td>
+                        <td class="num">28.92 ms</td>
+                        <td class="num">1.87 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>org.json</td>
-                        <td>90.90</td>
-                        <td>7.70</td>
-                        <td>74.42</td>
-                        <td>3633416</td>
-                        <td>ok</td>
+                        <td class="num">91.60 ms</td>
+                        <td class="num">7.70 ms</td>
+                        <td class="num">76.17 ms</td>
+                        <td class="num">3.47 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>Jackson Streaming</td>
-                        <td>29.30</td>
-                        <td>7.20</td>
-                        <td>6.99</td>
-                        <td>3633416</td>
-                        <td>ok</td>
+                        <td class="num">22.50 ms</td>
+                        <td class="num">7.40 ms</td>
+                        <td class="num">7.74 ms</td>
+                        <td class="num">3.47 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>FlexBuffers</td>
-                        <td>37.30</td>
-                        <td>-</td>
-                        <td>16.35</td>
-                        <td>3664960</td>
-                        <td>error</td>
+                        <td class="num">44.60 ms</td>
+                        <td class="num">- ms</td>
+                        <td class="num">29.22 ms</td>
+                        <td class="num">3.50 MB</td>
+                        <td><span class="badge badge-error">error</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>FlatBuffers</td>
-                        <td>29.10</td>
-                        <td>6.00</td>
-                        <td>13.30</td>
-                        <td>2700384</td>
-                        <td>ok</td>
+                        <td class="num">29.20 ms</td>
+                        <td class="num">5.90 ms</td>
+                        <td class="num">14.30 ms</td>
+                        <td class="num">2.58 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>MessagePack</td>
-                        <td>24.80</td>
-                        <td>26.40</td>
-                        <td>6.23</td>
-                        <td>2828314</td>
-                        <td>ok</td>
+                        <td class="num">29.30 ms</td>
+                        <td class="num">26.70 ms</td>
+                        <td class="num">7.64 ms</td>
+                        <td class="num">2.70 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>CBOR</td>
-                        <td>31.20</td>
-                        <td>20.80</td>
-                        <td>7.35</td>
-                        <td>2839189</td>
-                        <td>ok</td>
+                        <td class="num">29.80 ms</td>
+                        <td class="num">20.00 ms</td>
+                        <td class="num">7.15 ms</td>
+                        <td class="num">2.71 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>Apache Arrow</td>
-                        <td>37.80</td>
-                        <td>0.50</td>
-                        <td>21.43</td>
-                        <td>1955984</td>
-                        <td>ok</td>
+                        <td class="num">42.40 ms</td>
+                        <td class="num">0.40 ms</td>
+                        <td class="num">25.69 ms</td>
+                        <td class="num">1.87 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>org.json</td>
-                        <td>72.90</td>
-                        <td>7.40</td>
-                        <td>61.47</td>
-                        <td>3633416</td>
-                        <td>ok</td>
+                        <td class="num">116.30 ms</td>
+                        <td class="num">7.70 ms</td>
+                        <td class="num">104.51 ms</td>
+                        <td class="num">3.47 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>Jackson Streaming</td>
-                        <td>24.50</td>
-                        <td>7.40</td>
-                        <td>6.24</td>
-                        <td>3633416</td>
-                        <td>ok</td>
+                        <td class="num">31.90 ms</td>
+                        <td class="num">7.30 ms</td>
+                        <td class="num">11.19 ms</td>
+                        <td class="num">3.47 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>FlexBuffers</td>
-                        <td>36.30</td>
-                        <td>-</td>
-                        <td>15.28</td>
-                        <td>3664960</td>
-                        <td>error</td>
+                        <td class="num">31.10 ms</td>
+                        <td class="num">- ms</td>
+                        <td class="num">16.20 ms</td>
+                        <td class="num">3.50 MB</td>
+                        <td><span class="badge badge-error">error</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>FlatBuffers</td>
-                        <td>28.20</td>
-                        <td>5.50</td>
-                        <td>16.90</td>
-                        <td>2700384</td>
-                        <td>ok</td>
+                        <td class="num">34.10 ms</td>
+                        <td class="num">5.30 ms</td>
+                        <td class="num">10.64 ms</td>
+                        <td class="num">2.58 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>MessagePack</td>
-                        <td>28.20</td>
-                        <td>23.40</td>
-                        <td>5.77</td>
-                        <td>2828314</td>
-                        <td>ok</td>
+                        <td class="num">26.60 ms</td>
+                        <td class="num">23.20 ms</td>
+                        <td class="num">7.03 ms</td>
+                        <td class="num">2.70 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>CBOR</td>
-                        <td>20.50</td>
-                        <td>19.40</td>
-                        <td>5.61</td>
-                        <td>2839189</td>
-                        <td>ok</td>
+                        <td class="num">21.10 ms</td>
+                        <td class="num">19.60 ms</td>
+                        <td class="num">9.74 ms</td>
+                        <td class="num">2.71 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>Apache Arrow</td>
-                        <td>27.90</td>
-                        <td>0.50</td>
-                        <td>14.33</td>
-                        <td>1955984</td>
-                        <td>ok</td>
+                        <td class="num">30.40 ms</td>
+                        <td class="num">0.40 ms</td>
+                        <td class="num">12.26 ms</td>
+                        <td class="num">1.87 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
               </tbody>
@@ -901,108 +1161,119 @@
             <h2>LARGE Dataset</h2>
             <span class="note">3 runs</span>
           </div>
+          <div class="size-topline">
+            <span class="pill">Fastest: Apache Arrow (75.93 ms)</span>
+            <span class="pill">Smallest payload: Apache Arrow (9.40 MB)</span>
+            <span class="pill pill-warn">Errors: 3 errors</span>
+          </div>
           <div class="chart-grid">
-            <canvas id="chart-times-large" height="220"></canvas>
-            <canvas id="chart-bytes-large" height="220"></canvas>
+            <div class="chart-card">
+              <div class="chart-title">Latency breakdown (ms)</div>
+              <canvas id="chart-times-large" height="220"></canvas>
+            </div>
+            <div class="chart-card">
+              <div class="chart-title">Payload size (bytes)</div>
+              <canvas id="chart-bytes-large" height="220"></canvas>
+            </div>
           </div>
           <h3>Aggregated Metrics</h3>
-          <table>
+          <table class="data-table">
             <thead>
               <tr>
                 <th>Format</th>
-                <th>End-to-End Mean (ms)</th>
-                <th>End-to-End P95 (ms)</th>
-                <th>Parse Mean (ms)</th>
-                <th>Serialize Mean (ms)</th>
-                <th>Payload Mean (bytes)</th>
+                <th class="num">End-to-End Mean</th>
+                <th class="num">End-to-End P95</th>
+                <th class="num">Parse Mean</th>
+                <th class="num">Serialize Mean</th>
+                <th class="num">Payload Mean</th>
                 <th>Errors</th>
               </tr>
             </thead>
             <tbody>
               
-                    <tr>
+                    <tr class="">
                       <td>org.json</td>
-                      <td>378.13</td>
-                      <td>379.60</td>
-                      <td>39.53</td>
-                      <td>323.12</td>
-                      <td>18295111</td>
-                      <td>0</td>
+                      <td class="num">368.70 ms</td>
+                      <td class="num">352.70 ms</td>
+                      <td class="num">38.50 ms</td>
+                      <td class="num">305.99 ms</td>
+                      <td class="num">17.45 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>Jackson Streaming</td>
-                      <td>110.30</td>
-                      <td>107.50</td>
-                      <td>37.97</td>
-                      <td>43.56</td>
-                      <td>18295111</td>
-                      <td>0</td>
+                      <td class="num">108.10 ms</td>
+                      <td class="num">114.20 ms</td>
+                      <td class="num">36.87 ms</td>
+                      <td class="num">45.49 ms</td>
+                      <td class="num">17.45 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="row-high">
                       <td>FlexBuffers</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>-</td>
-                      <td>3</td>
+                      <td class="num">- ms</td>
+                      <td class="num">- ms</td>
+                      <td class="num">- ms</td>
+                      <td class="num">- ms</td>
+                      <td class="num">-</td>
+                      <td><span class="badge badge-error">3</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>FlatBuffers</td>
-                      <td>84.43</td>
-                      <td>89.30</td>
-                      <td>29.67</td>
-                      <td>32.20</td>
-                      <td>13504552</td>
-                      <td>0</td>
+                      <td class="num">81.40 ms</td>
+                      <td class="num">83.10 ms</td>
+                      <td class="num">30.90 ms</td>
+                      <td class="num">31.73 ms</td>
+                      <td class="num">12.88 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>MessagePack</td>
-                      <td>96.73</td>
-                      <td>103.50</td>
-                      <td>132.33</td>
-                      <td>33.63</td>
-                      <td>14226652</td>
-                      <td>0</td>
+                      <td class="num">76.60 ms</td>
+                      <td class="num">77.70 ms</td>
+                      <td class="num">137.60 ms</td>
+                      <td class="num">21.76 ms</td>
+                      <td class="num">13.57 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>CBOR</td>
-                      <td>91.27</td>
-                      <td>98.00</td>
-                      <td>100.83</td>
-                      <td>32.63</td>
-                      <td>14280750</td>
-                      <td>0</td>
+                      <td class="num">79.27 ms</td>
+                      <td class="num">78.10 ms</td>
+                      <td class="num">100.77 ms</td>
+                      <td class="num">29.73 ms</td>
+                      <td class="num">13.62 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
-                    <tr>
+                    <tr class="">
                       <td>Apache Arrow</td>
-                      <td>79.57</td>
-                      <td>74.50</td>
-                      <td>0.77</td>
-                      <td>39.31</td>
-                      <td>9853984</td>
-                      <td>0</td>
+                      <td class="num">75.93 ms</td>
+                      <td class="num">76.80 ms</td>
+                      <td class="num">0.80 ms</td>
+                      <td class="num">38.77 ms</td>
+                      <td class="num">9.40 MB</td>
+                      <td><span class="badge badge-ok">0</span></td>
                     </tr>
                   
             </tbody>
           </table>
           <details>
             <summary>Run Details</summary>
-            <table>
+            <table class="data-table">
               <thead>
                 <tr>
                   <th>Iteration</th>
                   <th>Format</th>
-                  <th>End-to-End (ms)</th>
-                  <th>Parse (ms)</th>
-                  <th>Serialize (ms)</th>
-                  <th>Payload (bytes)</th>
+                  <th class="num">End-to-End</th>
+                  <th class="num">Parse</th>
+                  <th class="num">Serialize</th>
+                  <th class="num">Payload</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -1011,211 +1282,211 @@
                       <tr>
                         <td>1</td>
                         <td>org.json</td>
-                        <td>379.60</td>
-                        <td>40.30</td>
-                        <td>320.62</td>
-                        <td>18295111</td>
-                        <td>ok</td>
+                        <td class="num">414.80 ms</td>
+                        <td class="num">42.20 ms</td>
+                        <td class="num">340.57 ms</td>
+                        <td class="num">17.45 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>Jackson Streaming</td>
-                        <td>130.90</td>
-                        <td>37.90</td>
-                        <td>57.05</td>
-                        <td>18295111</td>
-                        <td>ok</td>
+                        <td class="num">124.70 ms</td>
+                        <td class="num">37.30 ms</td>
+                        <td class="num">54.37 ms</td>
+                        <td class="num">17.45 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>FlexBuffers</td>
-                        <td>158.30</td>
-                        <td>-</td>
-                        <td>86.89</td>
-                        <td>18678610</td>
-                        <td>error</td>
+                        <td class="num">152.10 ms</td>
+                        <td class="num">- ms</td>
+                        <td class="num">81.22 ms</td>
+                        <td class="num">17.81 MB</td>
+                        <td><span class="badge badge-error">error</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>FlatBuffers</td>
-                        <td>90.00</td>
-                        <td>30.40</td>
-                        <td>40.06</td>
-                        <td>13504552</td>
-                        <td>ok</td>
+                        <td class="num">89.60 ms</td>
+                        <td class="num">28.00 ms</td>
+                        <td class="num">36.28 ms</td>
+                        <td class="num">12.88 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>MessagePack</td>
-                        <td>104.20</td>
-                        <td>134.30</td>
-                        <td>45.47</td>
-                        <td>14226652</td>
-                        <td>ok</td>
+                        <td class="num">77.90 ms</td>
+                        <td class="num">135.20 ms</td>
+                        <td class="num">23.58 ms</td>
+                        <td class="num">13.57 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>CBOR</td>
-                        <td>98.00</td>
-                        <td>103.70</td>
-                        <td>36.75</td>
-                        <td>14280750</td>
-                        <td>ok</td>
+                        <td class="num">89.50 ms</td>
+                        <td class="num">103.90 ms</td>
+                        <td class="num">38.07 ms</td>
+                        <td class="num">13.62 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>1</td>
                         <td>Apache Arrow</td>
-                        <td>94.80</td>
-                        <td>0.40</td>
-                        <td>53.49</td>
-                        <td>9853984</td>
-                        <td>ok</td>
+                        <td class="num">77.40 ms</td>
+                        <td class="num">0.50 ms</td>
+                        <td class="num">38.57 ms</td>
+                        <td class="num">9.40 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>org.json</td>
-                        <td>384.50</td>
-                        <td>38.80</td>
-                        <td>332.43</td>
-                        <td>18295111</td>
-                        <td>ok</td>
+                        <td class="num">352.70 ms</td>
+                        <td class="num">37.30 ms</td>
+                        <td class="num">299.36 ms</td>
+                        <td class="num">17.45 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>Jackson Streaming</td>
-                        <td>107.50</td>
-                        <td>37.90</td>
-                        <td>40.05</td>
-                        <td>18295111</td>
-                        <td>ok</td>
+                        <td class="num">114.20 ms</td>
+                        <td class="num">36.90 ms</td>
+                        <td class="num">52.82 ms</td>
+                        <td class="num">17.45 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>FlexBuffers</td>
-                        <td>146.10</td>
-                        <td>-</td>
-                        <td>83.59</td>
-                        <td>18678610</td>
-                        <td>error</td>
+                        <td class="num">155.30 ms</td>
+                        <td class="num">- ms</td>
+                        <td class="num">100.34 ms</td>
+                        <td class="num">17.81 MB</td>
+                        <td><span class="badge badge-error">error</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>FlatBuffers</td>
-                        <td>74.00</td>
-                        <td>29.00</td>
-                        <td>25.91</td>
-                        <td>13504552</td>
-                        <td>ok</td>
+                        <td class="num">71.50 ms</td>
+                        <td class="num">36.90 ms</td>
+                        <td class="num">23.37 ms</td>
+                        <td class="num">12.88 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>MessagePack</td>
-                        <td>82.50</td>
-                        <td>132.50</td>
-                        <td>25.04</td>
-                        <td>14226652</td>
-                        <td>ok</td>
+                        <td class="num">74.20 ms</td>
+                        <td class="num">134.30 ms</td>
+                        <td class="num">22.38 ms</td>
+                        <td class="num">13.57 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>CBOR</td>
-                        <td>99.10</td>
-                        <td>102.40</td>
-                        <td>35.31</td>
-                        <td>14280750</td>
-                        <td>ok</td>
+                        <td class="num">78.10 ms</td>
+                        <td class="num">98.00 ms</td>
+                        <td class="num">31.69 ms</td>
+                        <td class="num">13.62 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>2</td>
                         <td>Apache Arrow</td>
-                        <td>74.50</td>
-                        <td>1.00</td>
-                        <td>31.62</td>
-                        <td>9853984</td>
-                        <td>ok</td>
+                        <td class="num">76.80 ms</td>
+                        <td class="num">1.00 ms</td>
+                        <td class="num">42.05 ms</td>
+                        <td class="num">9.40 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>org.json</td>
-                        <td>370.30</td>
-                        <td>39.50</td>
-                        <td>316.32</td>
-                        <td>18295111</td>
-                        <td>ok</td>
+                        <td class="num">338.60 ms</td>
+                        <td class="num">36.00 ms</td>
+                        <td class="num">278.05 ms</td>
+                        <td class="num">17.45 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>Jackson Streaming</td>
-                        <td>92.50</td>
-                        <td>38.10</td>
-                        <td>33.59</td>
-                        <td>18295111</td>
-                        <td>ok</td>
+                        <td class="num">85.40 ms</td>
+                        <td class="num">36.40 ms</td>
+                        <td class="num">29.28 ms</td>
+                        <td class="num">17.45 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>FlexBuffers</td>
-                        <td>139.40</td>
-                        <td>-</td>
-                        <td>75.18</td>
-                        <td>18678610</td>
-                        <td>error</td>
+                        <td class="num">149.60 ms</td>
+                        <td class="num">- ms</td>
+                        <td class="num">89.56 ms</td>
+                        <td class="num">17.81 MB</td>
+                        <td><span class="badge badge-error">error</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>FlatBuffers</td>
-                        <td>89.30</td>
-                        <td>29.60</td>
-                        <td>30.64</td>
-                        <td>13504552</td>
-                        <td>ok</td>
+                        <td class="num">83.10 ms</td>
+                        <td class="num">27.80 ms</td>
+                        <td class="num">35.54 ms</td>
+                        <td class="num">12.88 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>MessagePack</td>
-                        <td>103.50</td>
-                        <td>130.20</td>
-                        <td>30.37</td>
-                        <td>14226652</td>
-                        <td>ok</td>
+                        <td class="num">77.70 ms</td>
+                        <td class="num">143.30 ms</td>
+                        <td class="num">19.31 ms</td>
+                        <td class="num">13.57 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>CBOR</td>
-                        <td>76.70</td>
-                        <td>96.40</td>
-                        <td>25.84</td>
-                        <td>14280750</td>
-                        <td>ok</td>
+                        <td class="num">70.20 ms</td>
+                        <td class="num">100.40 ms</td>
+                        <td class="num">19.42 ms</td>
+                        <td class="num">13.62 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
                       <tr>
                         <td>3</td>
                         <td>Apache Arrow</td>
-                        <td>69.40</td>
-                        <td>0.90</td>
-                        <td>32.81</td>
-                        <td>9853984</td>
-                        <td>ok</td>
+                        <td class="num">73.60 ms</td>
+                        <td class="num">0.90 ms</td>
+                        <td class="num">35.70 ms</td>
+                        <td class="num">9.40 MB</td>
+                        <td><span class="badge badge-ok">ok</span></td>
                       </tr>
                     
               </tbody>
@@ -1225,7 +1496,7 @@
       
   </main>
   <script>
-    const reportData = {"generatedAt":1770294289325,"iterations":3,"sizes":["small","medium","large"],"serverBase":"http://localhost:8090","clientBase":"http://localhost:5173","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36","runs":[{"sizePreset":"small","iteration":1,"startedAt":1770294276212,"completedAt":1770294276597,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":82.59999999403954,"payloadBytes":360438,"parseMs":0.699999988079071,"serverSerializeNanos":"16821333","serverPayloadBytes":"360438"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":28.69999998807907,"payloadBytes":360438,"parseMs":0.800000011920929,"serverSerializeNanos":"10966917","serverPayloadBytes":"360438"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":25.5,"payloadBytes":357400,"parseMs":null,"serverSerializeNanos":"17442750","serverPayloadBytes":"357400"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":17.400000005960464,"payloadBytes":268296,"parseMs":1.7000000178813934,"serverSerializeNanos":"12468667","serverPayloadBytes":"268296"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":20.599999994039536,"payloadBytes":280603,"parseMs":7.199999988079071,"serverSerializeNanos":"15138625","serverPayloadBytes":"280603"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":32.900000005960464,"payloadBytes":281782,"parseMs":3.5999999940395355,"serverSerializeNanos":"27844500","serverPayloadBytes":"281782"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":159.7000000178814,"payloadBytes":195736,"parseMs":2.699999988079071,"serverSerializeNanos":"154431000","serverPayloadBytes":"195736"}]},{"sizePreset":"small","iteration":2,"startedAt":1770294277543,"completedAt":1770294277638,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":11.900000005960464,"payloadBytes":360438,"parseMs":0.800000011920929,"serverSerializeNanos":"5786667","serverPayloadBytes":"360438"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":19.899999976158142,"payloadBytes":360438,"parseMs":0.7000000178813934,"serverSerializeNanos":"6059542","serverPayloadBytes":"360438"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":9.099999994039536,"payloadBytes":357400,"parseMs":null,"serverSerializeNanos":"3716542","serverPayloadBytes":"357400"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":7.0999999940395355,"payloadBytes":268296,"parseMs":0.800000011920929,"serverSerializeNanos":"2466917","serverPayloadBytes":"268296"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":22.80000001192093,"payloadBytes":280603,"parseMs":3.7999999821186066,"serverSerializeNanos":"2006750","serverPayloadBytes":"280603"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":6.200000017881393,"payloadBytes":281782,"parseMs":2.0999999940395355,"serverSerializeNanos":"1383125","serverPayloadBytes":"281782"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":9,"payloadBytes":195736,"parseMs":0.5999999940395355,"serverSerializeNanos":"4201209","serverPayloadBytes":"195736"}]},{"sizePreset":"small","iteration":3,"startedAt":1770294278764,"completedAt":1770294278867,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":30.69999998807907,"payloadBytes":360438,"parseMs":0.800000011920929,"serverSerializeNanos":"6358625","serverPayloadBytes":"360438"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":9.799999982118607,"payloadBytes":360438,"parseMs":0.800000011920929,"serverSerializeNanos":"966375","serverPayloadBytes":"360438"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":15.900000005960464,"payloadBytes":357400,"parseMs":null,"serverSerializeNanos":"4919208","serverPayloadBytes":"357400"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":11,"payloadBytes":268296,"parseMs":0.5999999940395355,"serverSerializeNanos":"1599708","serverPayloadBytes":"268296"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":9.600000023841858,"payloadBytes":280603,"parseMs":2.0999999940395355,"serverSerializeNanos":"2482042","serverPayloadBytes":"280603"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":6.199999988079071,"payloadBytes":281782,"parseMs":1.9000000059604645,"serverSerializeNanos":"1009166","serverPayloadBytes":"281782"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":12.300000011920929,"payloadBytes":195736,"parseMs":0.699999988079071,"serverSerializeNanos":"5505959","serverPayloadBytes":"195736"}]},{"sizePreset":"medium","iteration":1,"startedAt":1770294280322,"completedAt":1770294280789,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":116,"payloadBytes":3633416,"parseMs":8.300000011920929,"serverSerializeNanos":"84764084","serverPayloadBytes":"3633416"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":45.5,"payloadBytes":3633416,"parseMs":7.4000000059604645,"serverSerializeNanos":"29412458","serverPayloadBytes":"3633416"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":54.400000005960464,"payloadBytes":3664960,"parseMs":null,"serverSerializeNanos":"35268000","serverPayloadBytes":"3664960"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":45.30000001192093,"payloadBytes":2700384,"parseMs":6.4000000059604645,"serverSerializeNanos":"21744625","serverPayloadBytes":"2700384"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":55.69999998807907,"payloadBytes":2828314,"parseMs":28.400000005960464,"serverSerializeNanos":"25492958","serverPayloadBytes":"2828314"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":33.900000005960464,"payloadBytes":2839189,"parseMs":20.30000001192093,"serverSerializeNanos":"16778708","serverPayloadBytes":"2839189"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":44.599999994039536,"payloadBytes":1955984,"parseMs":0.4000000059604645,"serverSerializeNanos":"24385000","serverPayloadBytes":"1955984"}]},{"sizePreset":"medium","iteration":2,"startedAt":1770294281579,"completedAt":1770294281928,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":90.90000000596046,"payloadBytes":3633416,"parseMs":7.699999988079071,"serverSerializeNanos":"74418208","serverPayloadBytes":"3633416"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":29.30000001192093,"payloadBytes":3633416,"parseMs":7.199999988079071,"serverSerializeNanos":"6991083","serverPayloadBytes":"3633416"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":37.30000001192093,"payloadBytes":3664960,"parseMs":null,"serverSerializeNanos":"16349959","serverPayloadBytes":"3664960"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":29.099999994039536,"payloadBytes":2700384,"parseMs":6,"serverSerializeNanos":"13298833","serverPayloadBytes":"2700384"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":24.799999982118607,"payloadBytes":2828314,"parseMs":26.400000005960464,"serverSerializeNanos":"6234208","serverPayloadBytes":"2828314"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":31.200000017881393,"payloadBytes":2839189,"parseMs":20.799999982118607,"serverSerializeNanos":"7346667","serverPayloadBytes":"2839189"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":37.80000001192093,"payloadBytes":1955984,"parseMs":0.5,"serverSerializeNanos":"21430000","serverPayloadBytes":"1955984"}]},{"sizePreset":"medium","iteration":3,"startedAt":1770294282805,"completedAt":1770294283108,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":72.89999997615814,"payloadBytes":3633416,"parseMs":7.4000000059604645,"serverSerializeNanos":"61469833","serverPayloadBytes":"3633416"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":24.5,"payloadBytes":3633416,"parseMs":7.4000000059604645,"serverSerializeNanos":"6242458","serverPayloadBytes":"3633416"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":36.30000001192093,"payloadBytes":3664960,"parseMs":null,"serverSerializeNanos":"15275000","serverPayloadBytes":"3664960"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":28.200000017881393,"payloadBytes":2700384,"parseMs":5.5,"serverSerializeNanos":"16904917","serverPayloadBytes":"2700384"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":28.19999998807907,"payloadBytes":2828314,"parseMs":23.400000005960464,"serverSerializeNanos":"5773042","serverPayloadBytes":"2828314"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":20.5,"payloadBytes":2839189,"parseMs":19.400000005960464,"serverSerializeNanos":"5613917","serverPayloadBytes":"2839189"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":27.900000005960464,"payloadBytes":1955984,"parseMs":0.5,"serverSerializeNanos":"14327333","serverPayloadBytes":"1955984"}]},{"sizePreset":"large","iteration":1,"startedAt":1770294284015,"completedAt":1770294285418,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":379.59999999403954,"payloadBytes":18295111,"parseMs":40.29999998211861,"serverSerializeNanos":"320624250","serverPayloadBytes":"18295111"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":130.90000000596046,"payloadBytes":18295111,"parseMs":37.900000005960464,"serverSerializeNanos":"57053583","serverPayloadBytes":"18295111"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":158.30000001192093,"payloadBytes":18678610,"parseMs":null,"serverSerializeNanos":"86886750","serverPayloadBytes":"18678610"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":90,"payloadBytes":13504552,"parseMs":30.400000005960464,"serverSerializeNanos":"40055333","serverPayloadBytes":"13504552"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":104.19999998807907,"payloadBytes":14226652,"parseMs":134.30000001192093,"serverSerializeNanos":"45474375","serverPayloadBytes":"14226652"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":98,"payloadBytes":14280750,"parseMs":103.69999998807907,"serverSerializeNanos":"36746791","serverPayloadBytes":"14280750"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":94.80000001192093,"payloadBytes":9853984,"parseMs":0.4000000059604645,"serverSerializeNanos":"53487708","serverPayloadBytes":"9853984"}]},{"sizePreset":"large","iteration":2,"startedAt":1770294286147,"completedAt":1770294287457,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":384.5,"payloadBytes":18295111,"parseMs":38.80000001192093,"serverSerializeNanos":"332429791","serverPayloadBytes":"18295111"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":107.5,"payloadBytes":18295111,"parseMs":37.900000005960464,"serverSerializeNanos":"40045750","serverPayloadBytes":"18295111"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":146.09999999403954,"payloadBytes":18678610,"parseMs":null,"serverSerializeNanos":"83587917","serverPayloadBytes":"18678610"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":74,"payloadBytes":13504552,"parseMs":29,"serverSerializeNanos":"25905000","serverPayloadBytes":"13504552"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":82.5,"payloadBytes":14226652,"parseMs":132.5,"serverSerializeNanos":"25035666","serverPayloadBytes":"14226652"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":99.09999999403954,"payloadBytes":14280750,"parseMs":102.40000000596046,"serverSerializeNanos":"35309666","serverPayloadBytes":"14280750"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":74.5,"payloadBytes":9853984,"parseMs":1,"serverSerializeNanos":"31618958","serverPayloadBytes":"9853984"}]},{"sizePreset":"large","iteration":3,"startedAt":1770294287943,"completedAt":1770294289219,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":370.30000001192093,"payloadBytes":18295111,"parseMs":39.5,"serverSerializeNanos":"316318916","serverPayloadBytes":"18295111"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":92.5,"payloadBytes":18295111,"parseMs":38.099999994039536,"serverSerializeNanos":"33585708","serverPayloadBytes":"18295111"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":139.40000000596046,"payloadBytes":18678610,"parseMs":null,"serverSerializeNanos":"75184042","serverPayloadBytes":"18678610"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":89.30000001192093,"payloadBytes":13504552,"parseMs":29.599999994039536,"serverSerializeNanos":"30635875","serverPayloadBytes":"13504552"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":103.5,"payloadBytes":14226652,"parseMs":130.2000000178814,"serverSerializeNanos":"30370250","serverPayloadBytes":"14226652"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":76.7000000178814,"payloadBytes":14280750,"parseMs":96.39999997615814,"serverSerializeNanos":"25839250","serverPayloadBytes":"14280750"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":69.39999997615814,"payloadBytes":9853984,"parseMs":0.9000000059604645,"serverSerializeNanos":"32813292","serverPayloadBytes":"9853984"}]}],"aggregates":{"small":[{"formatId":"orgjson","label":"org.json","endToEnd":{"mean":41.73333332935969,"median":30.69999998807907,"p95":30.69999998807907,"count":3},"parse":{"mean":0.7666666706403097,"median":0.800000011920929,"p95":0.800000011920929,"count":3},"serialize":{"mean":9.655541666666666,"median":6.358625,"p95":6.358625,"count":3},"payload":{"mean":360438,"median":360438,"p95":360438,"count":3},"serverPayload":{"mean":360438,"median":360438,"p95":360438,"count":3},"errors":0},{"formatId":"jacksonstream","label":"Jackson Streaming","endToEnd":{"mean":19.466666648785274,"median":19.899999976158142,"p95":19.899999976158142,"count":3},"parse":{"mean":0.7666666805744171,"median":0.800000011920929,"p95":0.800000011920929,"count":3},"serialize":{"mean":5.997611333333334,"median":6.059542,"p95":6.059542,"count":3},"payload":{"mean":360438,"median":360438,"p95":360438,"count":3},"serverPayload":{"mean":360438,"median":360438,"p95":360438,"count":3},"errors":0},{"formatId":"flexbuffers","label":"FlexBuffers","endToEnd":{"mean":null,"median":null,"p95":null,"count":0},"parse":{"mean":null,"median":null,"p95":null,"count":0},"serialize":{"mean":null,"median":null,"p95":null,"count":0},"payload":{"mean":null,"median":null,"p95":null,"count":0},"serverPayload":{"mean":null,"median":null,"p95":null,"count":0},"errors":3},{"formatId":"flatbuffers","label":"FlatBuffers","endToEnd":{"mean":11.833333333333334,"median":11,"p95":11,"count":3},"parse":{"mean":1.0333333412806194,"median":0.800000011920929,"p95":0.800000011920929,"count":3},"serialize":{"mean":5.511763999999999,"median":2.466917,"p95":2.466917,"count":3},"payload":{"mean":268296,"median":268296,"p95":268296,"count":3},"serverPayload":{"mean":268296,"median":268296,"p95":268296,"count":3},"errors":0},{"formatId":"messagepack","label":"MessagePack","endToEnd":{"mean":17.666666676600773,"median":20.599999994039536,"p95":20.599999994039536,"count":3},"parse":{"mean":4.366666654745738,"median":3.7999999821186066,"p95":3.7999999821186066,"count":3},"serialize":{"mean":6.5424723333333334,"median":2.482042,"p95":2.482042,"count":3},"payload":{"mean":280603,"median":280603,"p95":280603,"count":3},"serverPayload":{"mean":280603,"median":280603,"p95":280603,"count":3},"errors":0},{"formatId":"cbor","label":"CBOR","endToEnd":{"mean":15.100000003973642,"median":6.200000017881393,"p95":6.200000017881393,"count":3},"parse":{"mean":2.533333331346512,"median":2.0999999940395355,"p95":2.0999999940395355,"count":3},"serialize":{"mean":10.078930333333334,"median":1.383125,"p95":1.383125,"count":3},"payload":{"mean":281782,"median":281782,"p95":281782,"count":3},"serverPayload":{"mean":281782,"median":281782,"p95":281782,"count":3},"errors":0},{"formatId":"arrow","label":"Apache Arrow","endToEnd":{"mean":60.33333334326744,"median":12.300000011920929,"p95":12.300000011920929,"count":3},"parse":{"mean":1.333333323399226,"median":0.699999988079071,"p95":0.699999988079071,"count":3},"serialize":{"mean":54.71272266666667,"median":5.505959,"p95":5.505959,"count":3},"payload":{"mean":195736,"median":195736,"p95":195736,"count":3},"serverPayload":{"mean":195736,"median":195736,"p95":195736,"count":3},"errors":0}],"medium":[{"formatId":"orgjson","label":"org.json","endToEnd":{"mean":93.2666666607062,"median":90.90000000596046,"p95":90.90000000596046,"count":3},"parse":{"mean":7.800000001986821,"median":7.699999988079071,"p95":7.699999988079071,"count":3},"serialize":{"mean":73.55070833333333,"median":74.418208,"p95":74.418208,"count":3},"payload":{"mean":3633416,"median":3633416,"p95":3633416,"count":3},"serverPayload":{"mean":3633416,"median":3633416,"p95":3633416,"count":3},"errors":0},{"formatId":"jacksonstream","label":"Jackson Streaming","endToEnd":{"mean":33.10000000397364,"median":29.30000001192093,"p95":29.30000001192093,"count":3},"parse":{"mean":7.333333333333333,"median":7.4000000059604645,"p95":7.4000000059604645,"count":3},"serialize":{"mean":14.215333000000001,"median":6.991083,"p95":6.991083,"count":3},"payload":{"mean":3633416,"median":3633416,"p95":3633416,"count":3},"serverPayload":{"mean":3633416,"median":3633416,"p95":3633416,"count":3},"errors":0},{"formatId":"flexbuffers","label":"FlexBuffers","endToEnd":{"mean":null,"median":null,"p95":null,"count":0},"parse":{"mean":null,"median":null,"p95":null,"count":0},"serialize":{"mean":null,"median":null,"p95":null,"count":0},"payload":{"mean":null,"median":null,"p95":null,"count":0},"serverPayload":{"mean":null,"median":null,"p95":null,"count":0},"errors":3},{"formatId":"flatbuffers","label":"FlatBuffers","endToEnd":{"mean":34.20000000794729,"median":29.099999994039536,"p95":29.099999994039536,"count":3},"parse":{"mean":5.966666668653488,"median":6,"p95":6,"count":3},"serialize":{"mean":17.316125,"median":16.904917,"p95":16.904917,"count":3},"payload":{"mean":2700384,"median":2700384,"p95":2700384,"count":3},"serverPayload":{"mean":2700384,"median":2700384,"p95":2700384,"count":3},"errors":0},{"formatId":"messagepack","label":"MessagePack","endToEnd":{"mean":36.23333331942558,"median":28.19999998807907,"p95":28.19999998807907,"count":3},"parse":{"mean":26.066666672627132,"median":26.400000005960464,"p95":26.400000005960464,"count":3},"serialize":{"mean":12.500069333333334,"median":6.234208,"p95":6.234208,"count":3},"payload":{"mean":2828314,"median":2828314,"p95":2828314,"count":3},"serverPayload":{"mean":2828314,"median":2828314,"p95":2828314,"count":3},"errors":0},{"formatId":"cbor","label":"CBOR","endToEnd":{"mean":28.53333334128062,"median":31.200000017881393,"p95":31.200000017881393,"count":3},"parse":{"mean":20.166666666666668,"median":20.30000001192093,"p95":20.30000001192093,"count":3},"serialize":{"mean":9.913097333333335,"median":7.346667,"p95":7.346667,"count":3},"payload":{"mean":2839189,"median":2839189,"p95":2839189,"count":3},"serverPayload":{"mean":2839189,"median":2839189,"p95":2839189,"count":3},"errors":0},{"formatId":"arrow","label":"Apache Arrow","endToEnd":{"mean":36.76666667064031,"median":37.80000001192093,"p95":37.80000001192093,"count":3},"parse":{"mean":0.46666666865348816,"median":0.5,"p95":0.5,"count":3},"serialize":{"mean":20.047444333333335,"median":21.43,"p95":21.43,"count":3},"payload":{"mean":1955984,"median":1955984,"p95":1955984,"count":3},"serverPayload":{"mean":1955984,"median":1955984,"p95":1955984,"count":3},"errors":0}],"large":[{"formatId":"orgjson","label":"org.json","endToEnd":{"mean":378.1333333353202,"median":379.59999999403954,"p95":379.59999999403954,"count":3},"parse":{"mean":39.53333333134651,"median":39.5,"p95":39.5,"count":3},"serialize":{"mean":323.124319,"median":320.62425,"p95":320.62425,"count":3},"payload":{"mean":18295111,"median":18295111,"p95":18295111,"count":3},"serverPayload":{"mean":18295111,"median":18295111,"p95":18295111,"count":3},"errors":0},{"formatId":"jacksonstream","label":"Jackson Streaming","endToEnd":{"mean":110.30000000198682,"median":107.5,"p95":107.5,"count":3},"parse":{"mean":37.96666666865349,"median":37.900000005960464,"p95":37.900000005960464,"count":3},"serialize":{"mean":43.561680333333335,"median":40.04575,"p95":40.04575,"count":3},"payload":{"mean":18295111,"median":18295111,"p95":18295111,"count":3},"serverPayload":{"mean":18295111,"median":18295111,"p95":18295111,"count":3},"errors":0},{"formatId":"flexbuffers","label":"FlexBuffers","endToEnd":{"mean":null,"median":null,"p95":null,"count":0},"parse":{"mean":null,"median":null,"p95":null,"count":0},"serialize":{"mean":null,"median":null,"p95":null,"count":0},"payload":{"mean":null,"median":null,"p95":null,"count":0},"serverPayload":{"mean":null,"median":null,"p95":null,"count":0},"errors":3},{"formatId":"flatbuffers","label":"FlatBuffers","endToEnd":{"mean":84.43333333730698,"median":89.30000001192093,"p95":89.30000001192093,"count":3},"parse":{"mean":29.666666666666668,"median":29.599999994039536,"p95":29.599999994039536,"count":3},"serialize":{"mean":32.198736,"median":30.635875,"p95":30.635875,"count":3},"payload":{"mean":13504552,"median":13504552,"p95":13504552,"count":3},"serverPayload":{"mean":13504552,"median":13504552,"p95":13504552,"count":3},"errors":0},{"formatId":"messagepack","label":"MessagePack","endToEnd":{"mean":96.7333333293597,"median":103.5,"p95":103.5,"count":3},"parse":{"mean":132.33333334326744,"median":132.5,"p95":132.5,"count":3},"serialize":{"mean":33.62676366666667,"median":30.37025,"p95":30.37025,"count":3},"payload":{"mean":14226652,"median":14226652,"p95":14226652,"count":3},"serverPayload":{"mean":14226652,"median":14226652,"p95":14226652,"count":3},"errors":0},{"formatId":"cbor","label":"CBOR","endToEnd":{"mean":91.2666666706403,"median":98,"p95":98,"count":3},"parse":{"mean":100.83333332339923,"median":102.40000000596046,"p95":102.40000000596046,"count":3},"serialize":{"mean":32.631902333333336,"median":35.309666,"p95":35.309666,"count":3},"payload":{"mean":14280750,"median":14280750,"p95":14280750,"count":3},"serverPayload":{"mean":14280750,"median":14280750,"p95":14280750,"count":3},"errors":0},{"formatId":"arrow","label":"Apache Arrow","endToEnd":{"mean":79.56666666269302,"median":74.5,"p95":74.5,"count":3},"parse":{"mean":0.7666666706403097,"median":0.9000000059604645,"p95":0.9000000059604645,"count":3},"serialize":{"mean":39.306652666666665,"median":32.813292,"p95":32.813292,"count":3},"payload":{"mean":9853984,"median":9853984,"p95":9853984,"count":3},"serverPayload":{"mean":9853984,"median":9853984,"p95":9853984,"count":3},"errors":0}]},"details":{"small":[{"iteration":1,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":82.59999999403954,"parseMs":0.699999988079071,"serverSerializeMs":16.821333,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":1,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":28.69999998807907,"parseMs":0.800000011920929,"serverSerializeMs":10.966917,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":1,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":25.5,"parseMs":null,"serverSerializeMs":17.44275,"payloadBytes":357400,"serverPayloadBytes":357400},{"iteration":1,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":17.400000005960464,"parseMs":1.7000000178813934,"serverSerializeMs":12.468667,"payloadBytes":268296,"serverPayloadBytes":268296},{"iteration":1,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":20.599999994039536,"parseMs":7.199999988079071,"serverSerializeMs":15.138625,"payloadBytes":280603,"serverPayloadBytes":280603},{"iteration":1,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":32.900000005960464,"parseMs":3.5999999940395355,"serverSerializeMs":27.8445,"payloadBytes":281782,"serverPayloadBytes":281782},{"iteration":1,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":159.7000000178814,"parseMs":2.699999988079071,"serverSerializeMs":154.431,"payloadBytes":195736,"serverPayloadBytes":195736},{"iteration":2,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":11.900000005960464,"parseMs":0.800000011920929,"serverSerializeMs":5.786667,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":2,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":19.899999976158142,"parseMs":0.7000000178813934,"serverSerializeMs":6.059542,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":2,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":9.099999994039536,"parseMs":null,"serverSerializeMs":3.716542,"payloadBytes":357400,"serverPayloadBytes":357400},{"iteration":2,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":7.0999999940395355,"parseMs":0.800000011920929,"serverSerializeMs":2.466917,"payloadBytes":268296,"serverPayloadBytes":268296},{"iteration":2,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":22.80000001192093,"parseMs":3.7999999821186066,"serverSerializeMs":2.00675,"payloadBytes":280603,"serverPayloadBytes":280603},{"iteration":2,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":6.200000017881393,"parseMs":2.0999999940395355,"serverSerializeMs":1.383125,"payloadBytes":281782,"serverPayloadBytes":281782},{"iteration":2,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":9,"parseMs":0.5999999940395355,"serverSerializeMs":4.201209,"payloadBytes":195736,"serverPayloadBytes":195736},{"iteration":3,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":30.69999998807907,"parseMs":0.800000011920929,"serverSerializeMs":6.358625,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":3,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":9.799999982118607,"parseMs":0.800000011920929,"serverSerializeMs":0.966375,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":3,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":15.900000005960464,"parseMs":null,"serverSerializeMs":4.919208,"payloadBytes":357400,"serverPayloadBytes":357400},{"iteration":3,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":11,"parseMs":0.5999999940395355,"serverSerializeMs":1.599708,"payloadBytes":268296,"serverPayloadBytes":268296},{"iteration":3,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":9.600000023841858,"parseMs":2.0999999940395355,"serverSerializeMs":2.482042,"payloadBytes":280603,"serverPayloadBytes":280603},{"iteration":3,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":6.199999988079071,"parseMs":1.9000000059604645,"serverSerializeMs":1.009166,"payloadBytes":281782,"serverPayloadBytes":281782},{"iteration":3,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":12.300000011920929,"parseMs":0.699999988079071,"serverSerializeMs":5.505959,"payloadBytes":195736,"serverPayloadBytes":195736}],"medium":[{"iteration":1,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":116,"parseMs":8.300000011920929,"serverSerializeMs":84.764084,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":1,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":45.5,"parseMs":7.4000000059604645,"serverSerializeMs":29.412458,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":1,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":54.400000005960464,"parseMs":null,"serverSerializeMs":35.268,"payloadBytes":3664960,"serverPayloadBytes":3664960},{"iteration":1,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":45.30000001192093,"parseMs":6.4000000059604645,"serverSerializeMs":21.744625,"payloadBytes":2700384,"serverPayloadBytes":2700384},{"iteration":1,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":55.69999998807907,"parseMs":28.400000005960464,"serverSerializeMs":25.492958,"payloadBytes":2828314,"serverPayloadBytes":2828314},{"iteration":1,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":33.900000005960464,"parseMs":20.30000001192093,"serverSerializeMs":16.778708,"payloadBytes":2839189,"serverPayloadBytes":2839189},{"iteration":1,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":44.599999994039536,"parseMs":0.4000000059604645,"serverSerializeMs":24.385,"payloadBytes":1955984,"serverPayloadBytes":1955984},{"iteration":2,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":90.90000000596046,"parseMs":7.699999988079071,"serverSerializeMs":74.418208,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":2,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":29.30000001192093,"parseMs":7.199999988079071,"serverSerializeMs":6.991083,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":2,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":37.30000001192093,"parseMs":null,"serverSerializeMs":16.349959,"payloadBytes":3664960,"serverPayloadBytes":3664960},{"iteration":2,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":29.099999994039536,"parseMs":6,"serverSerializeMs":13.298833,"payloadBytes":2700384,"serverPayloadBytes":2700384},{"iteration":2,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":24.799999982118607,"parseMs":26.400000005960464,"serverSerializeMs":6.234208,"payloadBytes":2828314,"serverPayloadBytes":2828314},{"iteration":2,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":31.200000017881393,"parseMs":20.799999982118607,"serverSerializeMs":7.346667,"payloadBytes":2839189,"serverPayloadBytes":2839189},{"iteration":2,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":37.80000001192093,"parseMs":0.5,"serverSerializeMs":21.43,"payloadBytes":1955984,"serverPayloadBytes":1955984},{"iteration":3,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":72.89999997615814,"parseMs":7.4000000059604645,"serverSerializeMs":61.469833,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":3,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":24.5,"parseMs":7.4000000059604645,"serverSerializeMs":6.242458,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":3,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":36.30000001192093,"parseMs":null,"serverSerializeMs":15.275,"payloadBytes":3664960,"serverPayloadBytes":3664960},{"iteration":3,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":28.200000017881393,"parseMs":5.5,"serverSerializeMs":16.904917,"payloadBytes":2700384,"serverPayloadBytes":2700384},{"iteration":3,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":28.19999998807907,"parseMs":23.400000005960464,"serverSerializeMs":5.773042,"payloadBytes":2828314,"serverPayloadBytes":2828314},{"iteration":3,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":20.5,"parseMs":19.400000005960464,"serverSerializeMs":5.613917,"payloadBytes":2839189,"serverPayloadBytes":2839189},{"iteration":3,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":27.900000005960464,"parseMs":0.5,"serverSerializeMs":14.327333,"payloadBytes":1955984,"serverPayloadBytes":1955984}],"large":[{"iteration":1,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":379.59999999403954,"parseMs":40.29999998211861,"serverSerializeMs":320.62425,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":1,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":130.90000000596046,"parseMs":37.900000005960464,"serverSerializeMs":57.053583,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":1,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":158.30000001192093,"parseMs":null,"serverSerializeMs":86.88675,"payloadBytes":18678610,"serverPayloadBytes":18678610},{"iteration":1,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":90,"parseMs":30.400000005960464,"serverSerializeMs":40.055333,"payloadBytes":13504552,"serverPayloadBytes":13504552},{"iteration":1,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":104.19999998807907,"parseMs":134.30000001192093,"serverSerializeMs":45.474375,"payloadBytes":14226652,"serverPayloadBytes":14226652},{"iteration":1,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":98,"parseMs":103.69999998807907,"serverSerializeMs":36.746791,"payloadBytes":14280750,"serverPayloadBytes":14280750},{"iteration":1,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":94.80000001192093,"parseMs":0.4000000059604645,"serverSerializeMs":53.487708,"payloadBytes":9853984,"serverPayloadBytes":9853984},{"iteration":2,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":384.5,"parseMs":38.80000001192093,"serverSerializeMs":332.429791,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":2,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":107.5,"parseMs":37.900000005960464,"serverSerializeMs":40.04575,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":2,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":146.09999999403954,"parseMs":null,"serverSerializeMs":83.587917,"payloadBytes":18678610,"serverPayloadBytes":18678610},{"iteration":2,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":74,"parseMs":29,"serverSerializeMs":25.905,"payloadBytes":13504552,"serverPayloadBytes":13504552},{"iteration":2,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":82.5,"parseMs":132.5,"serverSerializeMs":25.035666,"payloadBytes":14226652,"serverPayloadBytes":14226652},{"iteration":2,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":99.09999999403954,"parseMs":102.40000000596046,"serverSerializeMs":35.309666,"payloadBytes":14280750,"serverPayloadBytes":14280750},{"iteration":2,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":74.5,"parseMs":1,"serverSerializeMs":31.618958,"payloadBytes":9853984,"serverPayloadBytes":9853984},{"iteration":3,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":370.30000001192093,"parseMs":39.5,"serverSerializeMs":316.318916,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":3,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":92.5,"parseMs":38.099999994039536,"serverSerializeMs":33.585708,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":3,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":139.40000000596046,"parseMs":null,"serverSerializeMs":75.184042,"payloadBytes":18678610,"serverPayloadBytes":18678610},{"iteration":3,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":89.30000001192093,"parseMs":29.599999994039536,"serverSerializeMs":30.635875,"payloadBytes":13504552,"serverPayloadBytes":13504552},{"iteration":3,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":103.5,"parseMs":130.2000000178814,"serverSerializeMs":30.37025,"payloadBytes":14226652,"serverPayloadBytes":14226652},{"iteration":3,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":76.7000000178814,"parseMs":96.39999997615814,"serverSerializeMs":25.83925,"payloadBytes":14280750,"serverPayloadBytes":14280750},{"iteration":3,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":69.39999997615814,"parseMs":0.9000000059604645,"serverSerializeMs":32.813292,"payloadBytes":9853984,"serverPayloadBytes":9853984}]}};
+    const reportData = {"generatedAt":1770294942579,"iterations":3,"sizes":["small","medium","large"],"serverBase":"http://localhost:8090","clientBase":"http://localhost:5173","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36","runs":[{"sizePreset":"small","iteration":1,"startedAt":1770294930669,"completedAt":1770294931015,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":89.39999997615814,"payloadBytes":360438,"parseMs":0.800000011920929,"serverSerializeNanos":"19678416","serverPayloadBytes":"360438"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":26.400000005960464,"payloadBytes":360438,"parseMs":0.800000011920929,"serverSerializeNanos":"16482583","serverPayloadBytes":"360438"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":21.599999994039536,"payloadBytes":357400,"parseMs":null,"serverSerializeNanos":"14350500","serverPayloadBytes":"357400"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":17,"payloadBytes":268296,"parseMs":1.2999999821186066,"serverSerializeNanos":"12301500","serverPayloadBytes":"268296"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":16.600000023841858,"payloadBytes":280603,"parseMs":7.0999999940395355,"serverSerializeNanos":"11647458","serverPayloadBytes":"280603"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":28.900000005960464,"payloadBytes":281782,"parseMs":3.4000000059604645,"serverSerializeNanos":"23774500","serverPayloadBytes":"281782"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":129.5,"payloadBytes":195736,"parseMs":2.5,"serverSerializeNanos":"124474333","serverPayloadBytes":"195736"}]},{"sizePreset":"small","iteration":2,"startedAt":1770294931721,"completedAt":1770294931853,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":56.60000002384186,"payloadBytes":360438,"parseMs":0.7999999821186066,"serverSerializeNanos":"14131917","serverPayloadBytes":"360438"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":6.800000011920929,"payloadBytes":360438,"parseMs":0.7999999821186066,"serverSerializeNanos":"2409041","serverPayloadBytes":"360438"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":13.799999982118607,"payloadBytes":357400,"parseMs":null,"serverSerializeNanos":"3616875","serverPayloadBytes":"357400"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":10.5,"payloadBytes":268296,"parseMs":1,"serverSerializeNanos":"3149042","serverPayloadBytes":"268296"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":6.5999999940395355,"payloadBytes":280603,"parseMs":4.199999988079071,"serverSerializeNanos":"2078750","serverPayloadBytes":"280603"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":10.900000005960464,"payloadBytes":281782,"parseMs":2.0999999940395355,"serverSerializeNanos":"1516291","serverPayloadBytes":"281782"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":17.400000005960464,"payloadBytes":195736,"parseMs":0.30000001192092896,"serverSerializeNanos":"4423709","serverPayloadBytes":"195736"}]},{"sizePreset":"small","iteration":3,"startedAt":1770294932501,"completedAt":1770294932621,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":29.799999982118607,"payloadBytes":360438,"parseMs":0.7000000178813934,"serverSerializeNanos":"5548000","serverPayloadBytes":"360438"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":20,"payloadBytes":360438,"parseMs":0.7999999821186066,"serverSerializeNanos":"10586083","serverPayloadBytes":"360438"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":11.800000011920929,"payloadBytes":357400,"parseMs":null,"serverSerializeNanos":"4748916","serverPayloadBytes":"357400"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":24.80000001192093,"payloadBytes":268296,"parseMs":0.5999999940395355,"serverSerializeNanos":"2071417","serverPayloadBytes":"268296"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":10.099999994039536,"payloadBytes":280603,"parseMs":2.199999988079071,"serverSerializeNanos":"3106083","serverPayloadBytes":"280603"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":8.300000011920929,"payloadBytes":281782,"parseMs":1.9000000059604645,"serverSerializeNanos":"969083","serverPayloadBytes":"281782"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":8.300000011920929,"payloadBytes":195736,"parseMs":0.5,"serverSerializeNanos":"3765333","serverPayloadBytes":"195736"}]},{"sizePreset":"medium","iteration":1,"startedAt":1770294933291,"completedAt":1770294933728,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":102.5,"payloadBytes":3633416,"parseMs":7.5,"serverSerializeNanos":"68281042","serverPayloadBytes":"3633416"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":34.19999998807907,"payloadBytes":3633416,"parseMs":7.199999988079071,"serverSerializeNanos":"11400792","serverPayloadBytes":"3633416"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":78.5,"payloadBytes":3664960,"parseMs":null,"serverSerializeNanos":"42498500","serverPayloadBytes":"3664960"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":35.79999998211861,"payloadBytes":2700384,"parseMs":6.0999999940395355,"serverSerializeNanos":"15148250","serverPayloadBytes":"2700384"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":36,"payloadBytes":2828314,"parseMs":27.5,"serverSerializeNanos":"16407125","serverPayloadBytes":"2828314"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":36.69999998807907,"payloadBytes":2839189,"parseMs":21.19999998807907,"serverSerializeNanos":"14657625","serverPayloadBytes":"2839189"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":42.80000001192093,"payloadBytes":1955984,"parseMs":0.4000000059604645,"serverSerializeNanos":"28918542","serverPayloadBytes":"1955984"}]},{"sizePreset":"medium","iteration":2,"startedAt":1770294934434,"completedAt":1770294934793,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":91.59999999403954,"payloadBytes":3633416,"parseMs":7.700000017881393,"serverSerializeNanos":"76169041","serverPayloadBytes":"3633416"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":22.5,"payloadBytes":3633416,"parseMs":7.4000000059604645,"serverSerializeNanos":"7738459","serverPayloadBytes":"3633416"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":44.599999994039536,"payloadBytes":3664960,"parseMs":null,"serverSerializeNanos":"29219333","serverPayloadBytes":"3664960"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":29.200000017881393,"payloadBytes":2700384,"parseMs":5.9000000059604645,"serverSerializeNanos":"14296666","serverPayloadBytes":"2700384"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":29.30000001192093,"payloadBytes":2828314,"parseMs":26.69999998807907,"serverSerializeNanos":"7644417","serverPayloadBytes":"2828314"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":29.80000001192093,"payloadBytes":2839189,"parseMs":20,"serverSerializeNanos":"7146209","serverPayloadBytes":"2839189"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":42.400000005960464,"payloadBytes":1955984,"parseMs":0.4000000059604645,"serverSerializeNanos":"25685666","serverPayloadBytes":"1955984"}]},{"sizePreset":"medium","iteration":3,"startedAt":1770294936296,"completedAt":1770294936652,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":116.30000001192093,"payloadBytes":3633416,"parseMs":7.699999988079071,"serverSerializeNanos":"104514167","serverPayloadBytes":"3633416"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":31.900000005960464,"payloadBytes":3633416,"parseMs":7.299999982118607,"serverSerializeNanos":"11190542","serverPayloadBytes":"3633416"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":31.099999994039536,"payloadBytes":3664960,"parseMs":null,"serverSerializeNanos":"16203625","serverPayloadBytes":"3664960"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":34.099999994039536,"payloadBytes":2700384,"parseMs":5.300000011920929,"serverSerializeNanos":"10636458","serverPayloadBytes":"2700384"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":26.599999994039536,"payloadBytes":2828314,"parseMs":23.200000017881393,"serverSerializeNanos":"7032166","serverPayloadBytes":"2828314"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":21.099999994039536,"payloadBytes":2839189,"parseMs":19.599999994039536,"serverSerializeNanos":"9744333","serverPayloadBytes":"2839189"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":30.400000005960464,"payloadBytes":1955984,"parseMs":0.4000000059604645,"serverSerializeNanos":"12259666","serverPayloadBytes":"1955984"}]},{"sizePreset":"large","iteration":1,"startedAt":1770294937267,"completedAt":1770294938640,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":414.7999999821186,"payloadBytes":18295111,"parseMs":42.20000001788139,"serverSerializeNanos":"340569208","serverPayloadBytes":"18295111"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":124.69999998807907,"payloadBytes":18295111,"parseMs":37.30000001192093,"serverSerializeNanos":"54374584","serverPayloadBytes":"18295111"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":152.09999999403954,"payloadBytes":18678610,"parseMs":null,"serverSerializeNanos":"81219584","serverPayloadBytes":"18678610"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":89.59999999403954,"payloadBytes":13504552,"parseMs":28,"serverSerializeNanos":"36276166","serverPayloadBytes":"13504552"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":77.90000000596046,"payloadBytes":14226652,"parseMs":135.19999998807907,"serverSerializeNanos":"23579250","serverPayloadBytes":"14226652"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":89.5,"payloadBytes":14280750,"parseMs":103.90000000596046,"serverSerializeNanos":"38068166","serverPayloadBytes":"14280750"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":77.40000000596046,"payloadBytes":9853984,"parseMs":0.5,"serverSerializeNanos":"38574834","serverPayloadBytes":"9853984"}]},{"sizePreset":"large","iteration":2,"startedAt":1770294939268,"completedAt":1770294940535,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":352.69999998807907,"payloadBytes":18295111,"parseMs":37.30000001192093,"serverSerializeNanos":"299360791","serverPayloadBytes":"18295111"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":114.19999998807907,"payloadBytes":18295111,"parseMs":36.900000005960464,"serverSerializeNanos":"52824917","serverPayloadBytes":"18295111"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":155.30000001192093,"payloadBytes":18678610,"parseMs":null,"serverSerializeNanos":"100344167","serverPayloadBytes":"18678610"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":71.5,"payloadBytes":13504552,"parseMs":36.900000005960464,"serverSerializeNanos":"23371167","serverPayloadBytes":"13504552"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":74.19999998807907,"payloadBytes":14226652,"parseMs":134.30000001192093,"serverSerializeNanos":"22382708","serverPayloadBytes":"14226652"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":78.09999999403954,"payloadBytes":14280750,"parseMs":98,"serverSerializeNanos":"31692958","serverPayloadBytes":"14280750"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":76.80000001192093,"payloadBytes":9853984,"parseMs":1,"serverSerializeNanos":"42046291","serverPayloadBytes":"9853984"}]},{"sizePreset":"large","iteration":3,"startedAt":1770294941239,"completedAt":1770294942462,"results":[{"formatId":"orgjson","status":"ok","statusCode":200,"endToEndMs":338.60000002384186,"payloadBytes":18295111,"parseMs":36,"serverSerializeNanos":"278048875","serverPayloadBytes":"18295111"},{"formatId":"jacksonstream","status":"ok","statusCode":200,"endToEndMs":85.39999997615814,"payloadBytes":18295111,"parseMs":36.400000005960464,"serverSerializeNanos":"29275917","serverPayloadBytes":"18295111"},{"formatId":"flexbuffers","status":"error","statusCode":200,"message":"First argument to DataView constructor must be an ArrayBuffer","endToEndMs":149.60000002384186,"payloadBytes":18678610,"parseMs":null,"serverSerializeNanos":"89560667","serverPayloadBytes":"18678610"},{"formatId":"flatbuffers","status":"ok","statusCode":200,"endToEndMs":83.09999999403954,"payloadBytes":13504552,"parseMs":27.80000001192093,"serverSerializeNanos":"35536709","serverPayloadBytes":"13504552"},{"formatId":"messagepack","status":"ok","statusCode":200,"endToEndMs":77.69999998807907,"payloadBytes":14226652,"parseMs":143.30000001192093,"serverSerializeNanos":"19308791","serverPayloadBytes":"14226652"},{"formatId":"cbor","status":"ok","statusCode":200,"endToEndMs":70.2000000178814,"payloadBytes":14280750,"parseMs":100.39999997615814,"serverSerializeNanos":"19418166","serverPayloadBytes":"14280750"},{"formatId":"arrow","status":"ok","statusCode":200,"endToEndMs":73.60000002384186,"payloadBytes":9853984,"parseMs":0.8999999761581421,"serverSerializeNanos":"35697458","serverPayloadBytes":"9853984"}]}],"aggregates":{"small":[{"formatId":"orgjson","label":"org.json","endToEnd":{"mean":58.599999994039536,"median":56.60000002384186,"p95":56.60000002384186,"count":3},"parse":{"mean":0.7666666706403097,"median":0.7999999821186066,"p95":0.7999999821186066,"count":3},"serialize":{"mean":13.119444333333334,"median":14.131917,"p95":14.131917,"count":3},"payload":{"mean":360438,"median":360438,"p95":360438,"count":3},"serverPayload":{"mean":360438,"median":360438,"p95":360438,"count":3},"errors":0},{"formatId":"jacksonstream","label":"Jackson Streaming","endToEnd":{"mean":17.733333339293797,"median":20,"p95":20,"count":3},"parse":{"mean":0.799999992052714,"median":0.7999999821186066,"p95":0.7999999821186066,"count":3},"serialize":{"mean":9.825902333333334,"median":10.586083,"p95":10.586083,"count":3},"payload":{"mean":360438,"median":360438,"p95":360438,"count":3},"serverPayload":{"mean":360438,"median":360438,"p95":360438,"count":3},"errors":0},{"formatId":"flexbuffers","label":"FlexBuffers","endToEnd":{"mean":null,"median":null,"p95":null,"count":0},"parse":{"mean":null,"median":null,"p95":null,"count":0},"serialize":{"mean":null,"median":null,"p95":null,"count":0},"payload":{"mean":null,"median":null,"p95":null,"count":0},"serverPayload":{"mean":null,"median":null,"p95":null,"count":0},"errors":3},{"formatId":"flatbuffers","label":"FlatBuffers","endToEnd":{"mean":17.433333337306976,"median":17,"p95":17,"count":3},"parse":{"mean":0.9666666587193807,"median":1,"p95":1,"count":3},"serialize":{"mean":5.8406530000000005,"median":3.149042,"p95":3.149042,"count":3},"payload":{"mean":268296,"median":268296,"p95":268296,"count":3},"serverPayload":{"mean":268296,"median":268296,"p95":268296,"count":3},"errors":0},{"formatId":"messagepack","label":"MessagePack","endToEnd":{"mean":11.100000003973642,"median":10.099999994039536,"p95":10.099999994039536,"count":3},"parse":{"mean":4.499999990065892,"median":4.199999988079071,"p95":4.199999988079071,"count":3},"serialize":{"mean":5.610763666666666,"median":3.106083,"p95":3.106083,"count":3},"payload":{"mean":280603,"median":280603,"p95":280603,"count":3},"serverPayload":{"mean":280603,"median":280603,"p95":280603,"count":3},"errors":0},{"formatId":"cbor","label":"CBOR","endToEnd":{"mean":16.03333334128062,"median":10.900000005960464,"p95":10.900000005960464,"count":3},"parse":{"mean":2.466666668653488,"median":2.0999999940395355,"p95":2.0999999940395355,"count":3},"serialize":{"mean":8.753291333333333,"median":1.516291,"p95":1.516291,"count":3},"payload":{"mean":281782,"median":281782,"p95":281782,"count":3},"serverPayload":{"mean":281782,"median":281782,"p95":281782,"count":3},"errors":0},{"formatId":"arrow","label":"Apache Arrow","endToEnd":{"mean":51.7333333392938,"median":17.400000005960464,"p95":17.400000005960464,"count":3},"parse":{"mean":1.100000003973643,"median":0.5,"p95":0.5,"count":3},"serialize":{"mean":44.221125,"median":4.423709,"p95":4.423709,"count":3},"payload":{"mean":195736,"median":195736,"p95":195736,"count":3},"serverPayload":{"mean":195736,"median":195736,"p95":195736,"count":3},"errors":0}],"medium":[{"formatId":"orgjson","label":"org.json","endToEnd":{"mean":103.46666666865349,"median":102.5,"p95":102.5,"count":3},"parse":{"mean":7.633333335320155,"median":7.699999988079071,"p95":7.699999988079071,"count":3},"serialize":{"mean":82.98808333333334,"median":76.169041,"p95":76.169041,"count":3},"payload":{"mean":3633416,"median":3633416,"p95":3633416,"count":3},"serverPayload":{"mean":3633416,"median":3633416,"p95":3633416,"count":3},"errors":0},{"formatId":"jacksonstream","label":"Jackson Streaming","endToEnd":{"mean":29.533333331346512,"median":31.900000005960464,"p95":31.900000005960464,"count":3},"parse":{"mean":7.299999992052714,"median":7.299999982118607,"p95":7.299999982118607,"count":3},"serialize":{"mean":10.109931,"median":11.190542,"p95":11.190542,"count":3},"payload":{"mean":3633416,"median":3633416,"p95":3633416,"count":3},"serverPayload":{"mean":3633416,"median":3633416,"p95":3633416,"count":3},"errors":0},{"formatId":"flexbuffers","label":"FlexBuffers","endToEnd":{"mean":null,"median":null,"p95":null,"count":0},"parse":{"mean":null,"median":null,"p95":null,"count":0},"serialize":{"mean":null,"median":null,"p95":null,"count":0},"payload":{"mean":null,"median":null,"p95":null,"count":0},"serverPayload":{"mean":null,"median":null,"p95":null,"count":0},"errors":3},{"formatId":"flatbuffers","label":"FlatBuffers","endToEnd":{"mean":33.03333333134651,"median":34.099999994039536,"p95":34.099999994039536,"count":3},"parse":{"mean":5.766666670640309,"median":5.9000000059604645,"p95":5.9000000059604645,"count":3},"serialize":{"mean":13.360458,"median":14.296666,"p95":14.296666,"count":3},"payload":{"mean":2700384,"median":2700384,"p95":2700384,"count":3},"serverPayload":{"mean":2700384,"median":2700384,"p95":2700384,"count":3},"errors":0},{"formatId":"messagepack","label":"MessagePack","endToEnd":{"mean":30.633333335320156,"median":29.30000001192093,"p95":29.30000001192093,"count":3},"parse":{"mean":25.80000000198682,"median":26.69999998807907,"p95":26.69999998807907,"count":3},"serialize":{"mean":10.361236,"median":7.644417,"p95":7.644417,"count":3},"payload":{"mean":2828314,"median":2828314,"p95":2828314,"count":3},"serverPayload":{"mean":2828314,"median":2828314,"p95":2828314,"count":3},"errors":0},{"formatId":"cbor","label":"CBOR","endToEnd":{"mean":29.19999999801318,"median":29.80000001192093,"p95":29.80000001192093,"count":3},"parse":{"mean":20.266666660706203,"median":20,"p95":20,"count":3},"serialize":{"mean":10.516055666666666,"median":9.744333,"p95":9.744333,"count":3},"payload":{"mean":2839189,"median":2839189,"p95":2839189,"count":3},"serverPayload":{"mean":2839189,"median":2839189,"p95":2839189,"count":3},"errors":0},{"formatId":"arrow","label":"Apache Arrow","endToEnd":{"mean":38.53333334128062,"median":42.400000005960464,"p95":42.400000005960464,"count":3},"parse":{"mean":0.4000000059604645,"median":0.4000000059604645,"p95":0.4000000059604645,"count":3},"serialize":{"mean":22.287958,"median":25.685666,"p95":25.685666,"count":3},"payload":{"mean":1955984,"median":1955984,"p95":1955984,"count":3},"serverPayload":{"mean":1955984,"median":1955984,"p95":1955984,"count":3},"errors":0}],"large":[{"formatId":"orgjson","label":"org.json","endToEnd":{"mean":368.6999999980132,"median":352.69999998807907,"p95":352.69999998807907,"count":3},"parse":{"mean":38.500000009934105,"median":37.30000001192093,"p95":37.30000001192093,"count":3},"serialize":{"mean":305.992958,"median":299.360791,"p95":299.360791,"count":3},"payload":{"mean":18295111,"median":18295111,"p95":18295111,"count":3},"serverPayload":{"mean":18295111,"median":18295111,"p95":18295111,"count":3},"errors":0},{"formatId":"jacksonstream","label":"Jackson Streaming","endToEnd":{"mean":108.09999998410542,"median":114.19999998807907,"p95":114.19999998807907,"count":3},"parse":{"mean":36.86666667461395,"median":36.900000005960464,"p95":36.900000005960464,"count":3},"serialize":{"mean":45.491806,"median":52.824917,"p95":52.824917,"count":3},"payload":{"mean":18295111,"median":18295111,"p95":18295111,"count":3},"serverPayload":{"mean":18295111,"median":18295111,"p95":18295111,"count":3},"errors":0},{"formatId":"flexbuffers","label":"FlexBuffers","endToEnd":{"mean":null,"median":null,"p95":null,"count":0},"parse":{"mean":null,"median":null,"p95":null,"count":0},"serialize":{"mean":null,"median":null,"p95":null,"count":0},"payload":{"mean":null,"median":null,"p95":null,"count":0},"serverPayload":{"mean":null,"median":null,"p95":null,"count":0},"errors":3},{"formatId":"flatbuffers","label":"FlatBuffers","endToEnd":{"mean":81.39999999602635,"median":83.09999999403954,"p95":83.09999999403954,"count":3},"parse":{"mean":30.900000005960464,"median":28,"p95":28,"count":3},"serialize":{"mean":31.728014,"median":35.536709,"p95":35.536709,"count":3},"payload":{"mean":13504552,"median":13504552,"p95":13504552,"count":3},"serverPayload":{"mean":13504552,"median":13504552,"p95":13504552,"count":3},"errors":0},{"formatId":"messagepack","label":"MessagePack","endToEnd":{"mean":76.59999999403954,"median":77.69999998807907,"p95":77.69999998807907,"count":3},"parse":{"mean":137.60000000397363,"median":135.19999998807907,"p95":135.19999998807907,"count":3},"serialize":{"mean":21.756916333333333,"median":22.382708,"p95":22.382708,"count":3},"payload":{"mean":14226652,"median":14226652,"p95":14226652,"count":3},"serverPayload":{"mean":14226652,"median":14226652,"p95":14226652,"count":3},"errors":0},{"formatId":"cbor","label":"CBOR","endToEnd":{"mean":79.2666666706403,"median":78.09999999403954,"p95":78.09999999403954,"count":3},"parse":{"mean":100.7666666607062,"median":100.39999997615814,"p95":100.39999997615814,"count":3},"serialize":{"mean":29.726430000000004,"median":31.692958,"p95":31.692958,"count":3},"payload":{"mean":14280750,"median":14280750,"p95":14280750,"count":3},"serverPayload":{"mean":14280750,"median":14280750,"p95":14280750,"count":3},"errors":0},{"formatId":"arrow","label":"Apache Arrow","endToEnd":{"mean":75.93333334724109,"median":76.80000001192093,"p95":76.80000001192093,"count":3},"parse":{"mean":0.799999992052714,"median":0.8999999761581421,"p95":0.8999999761581421,"count":3},"serialize":{"mean":38.772861,"median":38.574834,"p95":38.574834,"count":3},"payload":{"mean":9853984,"median":9853984,"p95":9853984,"count":3},"serverPayload":{"mean":9853984,"median":9853984,"p95":9853984,"count":3},"errors":0}]},"details":{"small":[{"iteration":1,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":89.39999997615814,"parseMs":0.800000011920929,"serverSerializeMs":19.678416,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":1,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":26.400000005960464,"parseMs":0.800000011920929,"serverSerializeMs":16.482583,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":1,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":21.599999994039536,"parseMs":null,"serverSerializeMs":14.3505,"payloadBytes":357400,"serverPayloadBytes":357400},{"iteration":1,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":17,"parseMs":1.2999999821186066,"serverSerializeMs":12.3015,"payloadBytes":268296,"serverPayloadBytes":268296},{"iteration":1,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":16.600000023841858,"parseMs":7.0999999940395355,"serverSerializeMs":11.647458,"payloadBytes":280603,"serverPayloadBytes":280603},{"iteration":1,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":28.900000005960464,"parseMs":3.4000000059604645,"serverSerializeMs":23.7745,"payloadBytes":281782,"serverPayloadBytes":281782},{"iteration":1,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":129.5,"parseMs":2.5,"serverSerializeMs":124.474333,"payloadBytes":195736,"serverPayloadBytes":195736},{"iteration":2,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":56.60000002384186,"parseMs":0.7999999821186066,"serverSerializeMs":14.131917,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":2,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":6.800000011920929,"parseMs":0.7999999821186066,"serverSerializeMs":2.409041,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":2,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":13.799999982118607,"parseMs":null,"serverSerializeMs":3.616875,"payloadBytes":357400,"serverPayloadBytes":357400},{"iteration":2,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":10.5,"parseMs":1,"serverSerializeMs":3.149042,"payloadBytes":268296,"serverPayloadBytes":268296},{"iteration":2,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":6.5999999940395355,"parseMs":4.199999988079071,"serverSerializeMs":2.07875,"payloadBytes":280603,"serverPayloadBytes":280603},{"iteration":2,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":10.900000005960464,"parseMs":2.0999999940395355,"serverSerializeMs":1.516291,"payloadBytes":281782,"serverPayloadBytes":281782},{"iteration":2,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":17.400000005960464,"parseMs":0.30000001192092896,"serverSerializeMs":4.423709,"payloadBytes":195736,"serverPayloadBytes":195736},{"iteration":3,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":29.799999982118607,"parseMs":0.7000000178813934,"serverSerializeMs":5.548,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":3,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":20,"parseMs":0.7999999821186066,"serverSerializeMs":10.586083,"payloadBytes":360438,"serverPayloadBytes":360438},{"iteration":3,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":11.800000011920929,"parseMs":null,"serverSerializeMs":4.748916,"payloadBytes":357400,"serverPayloadBytes":357400},{"iteration":3,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":24.80000001192093,"parseMs":0.5999999940395355,"serverSerializeMs":2.071417,"payloadBytes":268296,"serverPayloadBytes":268296},{"iteration":3,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":10.099999994039536,"parseMs":2.199999988079071,"serverSerializeMs":3.106083,"payloadBytes":280603,"serverPayloadBytes":280603},{"iteration":3,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":8.300000011920929,"parseMs":1.9000000059604645,"serverSerializeMs":0.969083,"payloadBytes":281782,"serverPayloadBytes":281782},{"iteration":3,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":8.300000011920929,"parseMs":0.5,"serverSerializeMs":3.765333,"payloadBytes":195736,"serverPayloadBytes":195736}],"medium":[{"iteration":1,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":102.5,"parseMs":7.5,"serverSerializeMs":68.281042,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":1,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":34.19999998807907,"parseMs":7.199999988079071,"serverSerializeMs":11.400792,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":1,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":78.5,"parseMs":null,"serverSerializeMs":42.4985,"payloadBytes":3664960,"serverPayloadBytes":3664960},{"iteration":1,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":35.79999998211861,"parseMs":6.0999999940395355,"serverSerializeMs":15.14825,"payloadBytes":2700384,"serverPayloadBytes":2700384},{"iteration":1,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":36,"parseMs":27.5,"serverSerializeMs":16.407125,"payloadBytes":2828314,"serverPayloadBytes":2828314},{"iteration":1,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":36.69999998807907,"parseMs":21.19999998807907,"serverSerializeMs":14.657625,"payloadBytes":2839189,"serverPayloadBytes":2839189},{"iteration":1,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":42.80000001192093,"parseMs":0.4000000059604645,"serverSerializeMs":28.918542,"payloadBytes":1955984,"serverPayloadBytes":1955984},{"iteration":2,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":91.59999999403954,"parseMs":7.700000017881393,"serverSerializeMs":76.169041,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":2,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":22.5,"parseMs":7.4000000059604645,"serverSerializeMs":7.738459,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":2,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":44.599999994039536,"parseMs":null,"serverSerializeMs":29.219333,"payloadBytes":3664960,"serverPayloadBytes":3664960},{"iteration":2,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":29.200000017881393,"parseMs":5.9000000059604645,"serverSerializeMs":14.296666,"payloadBytes":2700384,"serverPayloadBytes":2700384},{"iteration":2,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":29.30000001192093,"parseMs":26.69999998807907,"serverSerializeMs":7.644417,"payloadBytes":2828314,"serverPayloadBytes":2828314},{"iteration":2,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":29.80000001192093,"parseMs":20,"serverSerializeMs":7.146209,"payloadBytes":2839189,"serverPayloadBytes":2839189},{"iteration":2,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":42.400000005960464,"parseMs":0.4000000059604645,"serverSerializeMs":25.685666,"payloadBytes":1955984,"serverPayloadBytes":1955984},{"iteration":3,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":116.30000001192093,"parseMs":7.699999988079071,"serverSerializeMs":104.514167,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":3,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":31.900000005960464,"parseMs":7.299999982118607,"serverSerializeMs":11.190542,"payloadBytes":3633416,"serverPayloadBytes":3633416},{"iteration":3,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":31.099999994039536,"parseMs":null,"serverSerializeMs":16.203625,"payloadBytes":3664960,"serverPayloadBytes":3664960},{"iteration":3,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":34.099999994039536,"parseMs":5.300000011920929,"serverSerializeMs":10.636458,"payloadBytes":2700384,"serverPayloadBytes":2700384},{"iteration":3,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":26.599999994039536,"parseMs":23.200000017881393,"serverSerializeMs":7.032166,"payloadBytes":2828314,"serverPayloadBytes":2828314},{"iteration":3,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":21.099999994039536,"parseMs":19.599999994039536,"serverSerializeMs":9.744333,"payloadBytes":2839189,"serverPayloadBytes":2839189},{"iteration":3,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":30.400000005960464,"parseMs":0.4000000059604645,"serverSerializeMs":12.259666,"payloadBytes":1955984,"serverPayloadBytes":1955984}],"large":[{"iteration":1,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":414.7999999821186,"parseMs":42.20000001788139,"serverSerializeMs":340.569208,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":1,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":124.69999998807907,"parseMs":37.30000001192093,"serverSerializeMs":54.374584,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":1,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":152.09999999403954,"parseMs":null,"serverSerializeMs":81.219584,"payloadBytes":18678610,"serverPayloadBytes":18678610},{"iteration":1,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":89.59999999403954,"parseMs":28,"serverSerializeMs":36.276166,"payloadBytes":13504552,"serverPayloadBytes":13504552},{"iteration":1,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":77.90000000596046,"parseMs":135.19999998807907,"serverSerializeMs":23.57925,"payloadBytes":14226652,"serverPayloadBytes":14226652},{"iteration":1,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":89.5,"parseMs":103.90000000596046,"serverSerializeMs":38.068166,"payloadBytes":14280750,"serverPayloadBytes":14280750},{"iteration":1,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":77.40000000596046,"parseMs":0.5,"serverSerializeMs":38.574834,"payloadBytes":9853984,"serverPayloadBytes":9853984},{"iteration":2,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":352.69999998807907,"parseMs":37.30000001192093,"serverSerializeMs":299.360791,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":2,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":114.19999998807907,"parseMs":36.900000005960464,"serverSerializeMs":52.824917,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":2,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":155.30000001192093,"parseMs":null,"serverSerializeMs":100.344167,"payloadBytes":18678610,"serverPayloadBytes":18678610},{"iteration":2,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":71.5,"parseMs":36.900000005960464,"serverSerializeMs":23.371167,"payloadBytes":13504552,"serverPayloadBytes":13504552},{"iteration":2,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":74.19999998807907,"parseMs":134.30000001192093,"serverSerializeMs":22.382708,"payloadBytes":14226652,"serverPayloadBytes":14226652},{"iteration":2,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":78.09999999403954,"parseMs":98,"serverSerializeMs":31.692958,"payloadBytes":14280750,"serverPayloadBytes":14280750},{"iteration":2,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":76.80000001192093,"parseMs":1,"serverSerializeMs":42.046291,"payloadBytes":9853984,"serverPayloadBytes":9853984},{"iteration":3,"formatId":"orgjson","label":"org.json","status":"ok","endToEndMs":338.60000002384186,"parseMs":36,"serverSerializeMs":278.048875,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":3,"formatId":"jacksonstream","label":"Jackson Streaming","status":"ok","endToEndMs":85.39999997615814,"parseMs":36.400000005960464,"serverSerializeMs":29.275917,"payloadBytes":18295111,"serverPayloadBytes":18295111},{"iteration":3,"formatId":"flexbuffers","label":"FlexBuffers","status":"error","endToEndMs":149.60000002384186,"parseMs":null,"serverSerializeMs":89.560667,"payloadBytes":18678610,"serverPayloadBytes":18678610},{"iteration":3,"formatId":"flatbuffers","label":"FlatBuffers","status":"ok","endToEndMs":83.09999999403954,"parseMs":27.80000001192093,"serverSerializeMs":35.536709,"payloadBytes":13504552,"serverPayloadBytes":13504552},{"iteration":3,"formatId":"messagepack","label":"MessagePack","status":"ok","endToEndMs":77.69999998807907,"parseMs":143.30000001192093,"serverSerializeMs":19.308791,"payloadBytes":14226652,"serverPayloadBytes":14226652},{"iteration":3,"formatId":"cbor","label":"CBOR","status":"ok","endToEndMs":70.2000000178814,"parseMs":100.39999997615814,"serverSerializeMs":19.418166,"payloadBytes":14280750,"serverPayloadBytes":14280750},{"iteration":3,"formatId":"arrow","label":"Apache Arrow","status":"ok","endToEndMs":73.60000002384186,"parseMs":0.8999999761581421,"serverSerializeMs":35.697458,"payloadBytes":9853984,"serverPayloadBytes":9853984}]}};
 
     function chartTimes(size, canvasId) {
       const rows = reportData.aggregates[size];
@@ -1249,17 +1520,17 @@
             {
               label: "End-to-End (ms)",
               data: endToEnd,
-              backgroundColor: "rgba(10, 77, 140, 0.75)"
+              backgroundColor: "rgba(15, 61, 122, 0.8)"
             },
             {
               label: "Parse (ms)",
               data: parse,
-              backgroundColor: "rgba(242, 161, 84, 0.7)"
+              backgroundColor: "rgba(255, 140, 66, 0.75)"
             },
             {
               label: "Serialize (ms)",
               data: serialize,
-              backgroundColor: "rgba(59, 130, 246, 0.65)"
+              backgroundColor: "rgba(96, 165, 250, 0.75)"
             }
           ]
         },
@@ -1293,12 +1564,12 @@
             {
               label: "Payload (bytes)",
               data: payload,
-              backgroundColor: "rgba(16, 185, 129, 0.7)"
+              backgroundColor: "rgba(16, 185, 129, 0.75)"
             },
             {
               label: "Server Payload (bytes)",
               data: serverPayload,
-              backgroundColor: "rgba(148, 163, 184, 0.7)"
+              backgroundColor: "rgba(148, 163, 184, 0.75)"
             }
           ]
         },
