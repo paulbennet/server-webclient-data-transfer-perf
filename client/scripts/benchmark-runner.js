@@ -1041,6 +1041,22 @@ function createReportHtml(reportData) {
       border-color: rgba(239, 68, 68, 0.4);
       color: #7f1d1d;
     }
+    /* Pills inside cards need dark text for visibility */
+    .card .pill {
+      background: rgba(15, 61, 122, 0.1);
+      color: var(--accent);
+      border-color: rgba(15, 61, 122, 0.25);
+    }
+    .card .pill-ok {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #0f3d1f;
+    }
+    .card .pill-warn {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #7f1d1d;
+    }
     main {
       max-width: 1120px;
       margin: -64px auto 72px;

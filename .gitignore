@@ -3,3 +3,5 @@ dist/
 .vite/
 .DS_Store
 server/target/
+.playwright-mcp
+tomcat.8090
