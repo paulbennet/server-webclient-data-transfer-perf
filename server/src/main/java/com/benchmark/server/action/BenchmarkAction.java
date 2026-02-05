@@ -1,6 +1,7 @@
 package com.benchmark.server.action;
 
 import com.benchmark.server.generator.EventDataGenerator;
+import com.benchmark.server.metrics.RequestMetrics;
 import com.benchmark.server.model.CalendarEvent;
 import com.benchmark.server.serialization.BinarySerializer;
 import com.benchmark.server.serialization.Format;
@@ -41,20 +42,41 @@ public class BenchmarkAction extends ActionSupport {
         int count = resolveSize(size);
         List<CalendarEvent> events = generator.generate(count);
 
-        long startNanos = System.nanoTime();
+        // Start metrics collection
+        RequestMetrics metrics = RequestMetrics.start();
+
         byte[] payload;
         try {
             payload = serializer.serialize(events);
         } catch (Exception ex) {
             return respondError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage());
         }
-        long serializeNanos = System.nanoTime() - startNanos;
+
+        // End metrics collection
+        metrics.end();
 
         HttpServletResponse response = ServletActionContext.getResponse();
         applyCors(response);
-        response.setHeader("X-Serialize-Nanos", Long.toString(serializeNanos));
+
+        // Timing metrics
+        response.setHeader("X-Serialize-Nanos", Long.toString(metrics.getElapsedNanos()));
         response.setHeader("X-Payload-Bytes", Integer.toString(payload.length));
         response.setHeader("X-Format", parsedFormat.id());
+
+        // Memory metrics
+        response.setHeader("X-Heap-Used-Before", Long.toString(metrics.getHeapUsedBefore()));
+        response.setHeader("X-Heap-Used-After", Long.toString(metrics.getHeapUsedAfter()));
+        response.setHeader("X-Heap-Delta", Long.toString(metrics.getHeapDelta()));
+
+        // GC metrics
+        response.setHeader("X-GC-Count", Long.toString(metrics.getGcCountDelta()));
+        response.setHeader("X-GC-Time-Ms", Long.toString(metrics.getGcTimeMsDelta()));
+
+        // CPU metrics
+        response.setHeader("X-CPU-Time-Nanos", Long.toString(metrics.getCpuTimeNanosDelta()));
+
+        // Event count for efficiency calculations
+        response.setHeader("X-Event-Count", Integer.toString(count));
 
         contentType = serializer.contentType();
         contentLength = payload.length;
@@ -95,13 +117,23 @@ public class BenchmarkAction extends ActionSupport {
         return SUCCESS;
     }
 
+    private static final String EXPOSED_HEADERS = String.join(", ",
+            "X-Serialize-Nanos",
+            "X-Payload-Bytes",
+            "X-Format",
+            "X-Heap-Used-Before",
+            "X-Heap-Used-After",
+            "X-Heap-Delta",
+            "X-GC-Count",
+            "X-GC-Time-Ms",
+            "X-CPU-Time-Nanos",
+            "X-Event-Count");
+
     private void applyCors(HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        response.setHeader(
-                "Access-Control-Expose-Headers",
-                "X-Serialize-Nanos, X-Payload-Bytes, X-Format");
+        response.setHeader("Access-Control-Expose-Headers", EXPOSED_HEADERS);
     }
 
     public InputStream getInputStream() {

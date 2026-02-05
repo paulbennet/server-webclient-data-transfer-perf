@@ -28,7 +28,10 @@ public class CorsFilter implements Filter {
             httpResponse.setHeader("Vary", "Origin");
             httpResponse.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,HEAD");
             httpResponse.setHeader("Access-Control-Allow-Headers", "*");
-            httpResponse.setHeader("Access-Control-Expose-Headers", "X-Serialize-Nanos,X-Payload-Bytes");
+            httpResponse.setHeader("Access-Control-Expose-Headers",
+                    "X-Serialize-Nanos,X-Payload-Bytes,X-Format," +
+                            "X-Heap-Used-Before,X-Heap-Used-After,X-Heap-Delta," +
+                            "X-GC-Count,X-GC-Time-Ms,X-CPU-Time-Nanos,X-Event-Count");
 
             if (request instanceof HttpServletRequest) {
                 HttpServletRequest httpRequest = (HttpServletRequest) request;
