@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class EmbeddedTomcat {
     public static void main(String[] args) throws Exception {
-        int port = Integer.parseInt(System.getProperty("server.port", "8080"));
+        int port = Integer.parseInt(System.getProperty("server.port", "8090"));
         Path webappDir = resolvePath("server.webapp", "src", "main", "webapp");
         Path classesDir = resolvePath("server.classes", "target", "classes");
 
