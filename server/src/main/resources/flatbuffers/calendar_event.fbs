@@ -1,0 +1,25 @@
+namespace com.benchmark.server.flatbuffers;
+
+table CalendarEvent {
+  id:long;
+  title:string;
+  location:string;
+  organizer:string;
+  startTime:long;
+  endTime:long;
+  attendees:int;
+  allDay:bool;
+  description:string;
+  tags:[string];
+  resources:[string];
+  createdAt:long;
+  updatedAt:long;
+  priority:int;
+  timezone:string;
+}
+
+table CalendarEventList {
+  events:[CalendarEvent];
+}
+
+root_type CalendarEventList;

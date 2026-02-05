@@ -1,0 +1,29 @@
+{
+    "name": "server-webclient-data-transfer-perf-client",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "benchmark:run": "node scripts/benchmark-runner.js"
+    },
+    "dependencies": {
+        "@emotion/react": "11.11.4",
+        "@emotion/styled": "11.11.5",
+        "@mui/icons-material": "5.15.14",
+        "@mui/material": "5.15.14",
+        "@msgpack/msgpack": "2.7.2",
+        "apache-arrow": "15.0.2",
+        "cbor-x": "1.5.8",
+        "flatbuffers": "24.3.25",
+        "react": "18.2.0",
+        "react-dom": "18.2.0"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-react": "4.2.1",
+        "playwright": "1.58.1",
+        "vite": "5.0.12"
+    }
+}

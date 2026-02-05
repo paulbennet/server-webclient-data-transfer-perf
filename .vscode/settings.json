@@ -1,0 +1,13 @@
+{
+    "java.compile.nullAnalysis.mode": "disabled",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.test.config": [
+        {
+            "name": "default",
+            "vmArgs": [
+                "--add-opens=java.base/java.nio=ALL-UNNAMED"
+            ]
+        }
+    ],
+    "java.test.defaultConfig": "default"
+}

@@ -1,0 +1,13 @@
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(
+    circle at top,
+    #f0f4ff 0%,
+    #f6f8ff 45%,
+    #ffffff 100%
+  );
+}

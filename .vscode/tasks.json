@@ -1,0 +1,95 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "server:package",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"-f",
+				"server/pom.xml",
+				"-DskipTests",
+				"package"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "server:test",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"-f",
+				"server/pom.xml",
+				"test"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "test"
+		},
+		{
+			"label": "server:run",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"-f",
+				"server/pom.xml",
+				"-DskipTests",
+				"compile",
+				"exec:java",
+				"-Dexec.mainClass=com.benchmark.server.EmbeddedTomcat",
+				"-Dserver.webapp=server/src/main/webapp",
+				"-Dserver.classes=server/target/classes"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "server:debug",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"-f",
+				"server/pom.xml",
+				"-DskipTests",
+				"compile",
+				"exec:java",
+				"-Dexec.mainClass=com.benchmark.server.EmbeddedTomcat",
+				"-Dexec.jvmArgs=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005",
+				"-Dserver.webapp=server/src/main/webapp",
+				"-Dserver.classes=server/target/classes"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "client:dev",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"--prefix",
+				"client",
+				"run",
+				"dev"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "client:build",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"--prefix",
+				"client",
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

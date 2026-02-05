@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN" "http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+    <constant name="struts.devMode" value="false" />
+
+    <package name="api" namespace="/api" extends="struts-default">
+        <action name="health" class="com.benchmark.server.action.HealthAction">
+            <result type="stream">
+                <param name="contentType">text/plain</param>
+                <param name="inputName">inputStream</param>
+            </result>
+        </action>
+
+        <action name="bench" class="com.benchmark.server.action.BenchmarkAction">
+            <result type="stream">
+                <param name="contentType">${contentType}</param>
+                <param name="inputName">inputStream</param>
+                <param name="contentLength">${contentLength}</param>
+            </result>
+        </action>
+    </package>
+</struts>
